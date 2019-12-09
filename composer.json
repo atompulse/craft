@@ -1,0 +1,40 @@
+{
+  "name": "atompulse/craft",
+  "description": "Atompulse Craft",
+  "type": "metapackage",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Petru Cojocar",
+      "email": "petru.cojocar@gmail.com"
+    }
+  ],
+  "repositories": [
+  ],
+  "autoload": {
+    "psr-4": {
+      "Craft\\": "src/"
+    },
+    "exclude-from-classmap": [
+      "**/Tests/"
+    ]
+  },
+  "require": {
+    "php": "^7.2",
+    "symfony/security-bundle": "4.4.*",
+    "symfony/routing": "4.4.*",
+    "paragonie/paseto": "^1.0",
+    "atompulse/domain": "^1.1"
+  },
+  "require-dev": {
+  },
+  "suggest": {
+  },
+  "config": {
+    "sort-packages": true,
+    "preferred-install": "dist"
+  },
+  "extra": {},
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
