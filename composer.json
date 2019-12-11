@@ -1,7 +1,7 @@
 {
   "name": "atompulse/craft",
   "description": "Atompulse Craft",
-  "type": "metapackage",
+  "type": "library",
   "license": "Apache-2.0",
   "authors": [
     {
@@ -13,7 +13,8 @@
   ],
   "autoload": {
     "psr-4": {
-      "Craft\\": "src/"
+      "Craft\\": "src/Craft/",
+      "CraftBundle\\": "src/CraftBundle/"
     },
     "exclude-from-classmap": [
       "**/Tests/"
@@ -23,6 +24,7 @@
     "php": "^7.2",
     "symfony/security-bundle": "4.4.*",
     "symfony/routing": "4.4.*",
+    "symfony/yaml": "4.4.*",
     "paragonie/paseto": "^1.0",
     "atompulse/domain": "^1.1"
   },

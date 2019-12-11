@@ -1,0 +1,23 @@
+services:
+
+  Craft\Security\User\SecurityUserProviderInterface: '@craft.security.user.provider'
+  craft.security.user.provider:
+    class: Craft\Security\User\SecurityUserProvider
+    arguments:
+      - '@Craft\Security\Authentication\TokenManagerInterface'
+      - '@Craft\Security\Authorization\AuthorizationRegistryInterface'
+
+
+  Craft\Security\Authentication\TokenAuthenticatorInterface: '@craft.security.authentication.token_authenticator'
+  craft.security.authentication.token_authenticator:
+    class: Craft\Security\Authentication\TokenAuthenticator
+    arguments:
+      - '@Craft\Security\User\SecurityUserProviderInterface'
+
+
+  Craft\Security\Authentication\TokenManagerInterface: '@craft.security.authentication.token_manager'
+  craft.security.authentication.token_manager:
+    class: Craft\Security\Authentication\TokenManager
+    arguments:
+      - '%craft.security.key%'
+      - '@logger'
