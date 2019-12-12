@@ -41,6 +41,10 @@ class Configuration implements ConfigurationInterface
             ->cannotBeEmpty()
             ->isRequired()
             ->end()
+            ->scalarNode('authentication_disabled')
+            ->defaultFalse()
+            ->info('Disable the authentication system')
+            ->end()
             ->end()
             ->end()
             ->end();

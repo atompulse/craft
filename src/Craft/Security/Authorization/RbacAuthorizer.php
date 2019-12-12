@@ -28,7 +28,7 @@ class RbacAuthorizer implements VoterInterface
 
     public function __construct(
         Security $security,
-        RoutesAuthorizationRegistry $routesAuthorization,
+        RoutesAuthorizationRegistryInterface $routesAuthorization,
         LoggerInterface $logger
     ) {
         $this->security = $security;

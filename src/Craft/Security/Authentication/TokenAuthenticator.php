@@ -2,6 +2,8 @@
 
 namespace Craft\Security\Authentication;
 
+use Craft\Messaging\Http\HttpStatusCodes;
+use Craft\Security\User\SecurityUser;
 use Craft\Security\User\SecurityUserInterface;
 use Craft\Security\User\SecurityUserProvider;
 use Craft\Security\User\SecurityUserProviderInterface;
@@ -62,7 +64,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator implements TokenAuth
     public function getCredentials(Request $request)
     {
         return [
-            'token' => $request->headers->get('X-TOKEN') ?? $request->query->get('x'),
+            'token' => $request->headers->get(TokenKey::HEADER_NAME) ?? $request->query->get(TokenKey::QUERY_NAME),
         ];
     }
 

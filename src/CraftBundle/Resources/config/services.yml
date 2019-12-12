@@ -1,3 +1,5 @@
+parameters:
+  craft.env: '%env(APP_ENV)%'
 services:
 
   Craft\Security\User\SecurityUserProviderInterface: '@craft.security.user.provider'
@@ -13,6 +15,7 @@ services:
     class: Craft\Security\Authentication\TokenAuthenticator
     arguments:
       - '@Craft\Security\User\SecurityUserProviderInterface'
+      - '@Craft\Security\User\SecurityUserProviderInterface'
 
 
   Craft\Security\Authentication\TokenManagerInterface: '@craft.security.authentication.token_manager'
@@ -20,4 +23,46 @@ services:
     class: Craft\Security\Authentication\TokenManager
     arguments:
       - '%craft.security.key%'
+      - '@Psr\Log\LoggerInterface'
+
+  Craft\Security\Authorization\RoutesAuthorizationRegistryInterface: '@craft.security.authorization.routes_registry'
+  craft.security.authorization.routes_registry:
+    class: Craft\Security\Authorization\RoutesAuthorizationRegistry
+    arguments:
+      - '@Symfony\Component\Routing\RouterInterface'
+      - '@Psr\Log\LoggerInterface'
+
+
+  # Resolve JSON POST body
+  Craft\Http\EventListener\JsonPostDataResolverListener:
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 9999 }
+
+  # Exception response handler
+  Craft\Http\EventListener\ExceptionHandlerListener:
+    arguments:
       - '@logger'
+      - "%craft.env%"
+    tags:
+      - { name: kernel.event_listener, event: kernel.exception, method: onKernelException, priority: 250 }
+
+  # Handle request objects building
+  Craft\Http\Controller\ActionArgumentResolver:
+    arguments: ['@logger', '@security.helper']
+    tags:
+      - { name: controller.argument_value_resolver, priority: 50 }
+
+  # Response output handler
+  Craft\Http\EventListener\ResponseHandlerListener:
+    arguments: ['@logger']
+    tags:
+      - { name: kernel.event_listener, event: kernel.view, method: build, priority: 255 }
+
+  # Authorization system voter
+  Craft\Security\Authorization\RbacAuthorizer:
+    arguments:
+      - '@security.helper'
+      - '@Craft\Security\Authorization\RoutesAuthorizationRegistryInterface'
+      - '@Psr\Log\LoggerInterface'
+    tags:
+      - { name: security.voter }
