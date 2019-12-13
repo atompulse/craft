@@ -27,14 +27,19 @@ class SecurityUserProvider implements SecurityUserProviderInterface
      * @var TokenManager
      */
     protected $tokenManager;
+    /**
+     * @var UserRegistryInterface
+     */
+    protected $userRegistry;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
-        AuthorizationRegistryInterface $authorizationRegistry
-    )
-    {
+        AuthorizationRegistryInterface $authorizationRegistry,
+        UserRegistryInterface $userRegistry
+    ) {
         $this->authorizationRegistry = $authorizationRegistry;
         $this->tokenManager = $tokenManager;
+        $this->userRegistry = $userRegistry;
     }
 
     /**
@@ -47,9 +52,7 @@ class SecurityUserProvider implements SecurityUserProviderInterface
 
         $operations = $this->authorizationRegistry->getRoleOperationsList($data['role']);
 
-        $user = new SecurityUser($data, $operations);
-
-        return $user;
+        return $this->userRegistry->getUser($data, $operations);
     }
 
     /**

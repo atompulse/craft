@@ -29,6 +29,11 @@ class CraftExtension extends Extension
         $authorizationRegistry = $config['security']['authorization_registry'];
         $container->setAlias('Craft\Security\Authorization\AuthorizationRegistryInterface', $authorizationRegistry);
 
+        // add alias for UserRegistryInterface
+        $userRegistry = $config['security']['user_registry'];
+        $container->setAlias('Craft\Security\User\UserRegistryInterface', $userRegistry);
+
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
