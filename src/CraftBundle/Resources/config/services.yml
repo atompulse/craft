@@ -8,13 +8,13 @@ services:
     arguments:
       - '@Craft\Security\Authentication\TokenManagerInterface'
       - '@Craft\Security\Authorization\AuthorizationRegistryInterface'
+      - '@Craft\Security\User\UserRegistryInterface'
 
 
   Craft\Security\Authentication\TokenAuthenticatorInterface: '@craft.security.authentication.token_authenticator'
   craft.security.authentication.token_authenticator:
     class: Craft\Security\Authentication\TokenAuthenticator
     arguments:
-      - '@Craft\Security\User\SecurityUserProviderInterface'
       - '@Craft\Security\User\SecurityUserProviderInterface'
 
 
@@ -32,6 +32,11 @@ services:
       - '@Symfony\Component\Routing\RouterInterface'
       - '@Psr\Log\LoggerInterface'
 
+  Craft\Security\Authorization\AuthorizationRegistryInterface: '@craft.security.authorization.authorization_registry'
+
+  Craft\Http\Controller\ActionArgumentBuilderInterface: '@craft.http.controller.action_argument_builder'
+
+  Craft\Security\User\UserRegistryInterface: '@craft.security.authorization.user_registry'
 
   # Resolve JSON POST body
   Craft\Http\EventListener\JsonPostDataResolverListener:
@@ -48,7 +53,10 @@ services:
 
   # Handle request objects building
   Craft\Http\Controller\ActionArgumentResolver:
-    arguments: ['@logger', '@security.helper']
+    arguments:
+      - '@logger'
+      - '@security.helper'
+      - '@craft.http.controller.action_argument_builder'
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
 

@@ -75,7 +75,8 @@ class TokenAuthenticator extends AbstractGuardAuthenticator implements TokenAuth
      *
      * @param mixed $credentials
      * @param UserProviderInterface $userProvider
-     * @return UserInterface
+     * @return SecurityUserInterface|UserInterface|null
+     * @throws \Exception
      */
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
@@ -85,6 +86,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator implements TokenAuth
     /**
      * @param string $token
      * @return SecurityUserInterface
+     * @throws \Exception
      */
     public function getSecurityUser(string $token): SecurityUserInterface
     {

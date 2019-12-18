@@ -26,13 +26,16 @@ class CraftExtension extends Extension
         $container->setParameter('craft.security.key', $config['security']['key']);
 
         // add alias for AuthorizationRegistryInterface
-        $authorizationRegistry = $config['security']['authorization_registry'];
-        $container->setAlias('Craft\Security\Authorization\AuthorizationRegistryInterface', $authorizationRegistry);
+        $configValue = $config['security']['authorization_registry'];
+        $container->setAlias('craft.security.authorization.authorization_registry', $configValue);
 
         // add alias for UserRegistryInterface
-        $userRegistry = $config['security']['user_registry'];
-        $container->setAlias('Craft\Security\User\UserRegistryInterface', $userRegistry);
+        $configValue = $config['security']['user_registry'];
+        $container->setAlias('craft.security.authorization.user_registry', $configValue);
 
+        // add alias for ActionArgumentBuilderInterface
+        $configValue = $config['http']['action_argument_builder'];
+        $container->setAlias('craft.http.controller.action_argument_builder', $configValue);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');

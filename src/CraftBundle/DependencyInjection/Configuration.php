@@ -23,6 +23,8 @@ class Configuration implements ConfigurationInterface
 
         $this->addSecurityConfiguration($treeBuilder->getRootNode());
 
+        $this->addHttpConfiguration($treeBuilder->getRootNode());
+
         return $treeBuilder;
     }
 
@@ -30,27 +32,44 @@ class Configuration implements ConfigurationInterface
     {
         $rootNode
             ->children()
-            ->arrayNode('security')
-            ->isRequired()
+                ->arrayNode('security')
+                    ->isRequired()
+                    ->children()
+                        ->scalarNode('key')
+                            ->cannotBeEmpty()
+                            ->isRequired()
+                        ->end()
+                        ->scalarNode('user_registry')
+                            ->cannotBeEmpty()
+                            ->isRequired()
+                        ->end()
+                        ->scalarNode('authorization_registry')
+                            ->cannotBeEmpty()
+                            ->isRequired()
+                        ->end()
+                        ->scalarNode('authentication_disabled')
+                            ->defaultFalse()
+                            ->info('Disable the authentication system')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+    }
+
+    protected function addHttpConfiguration(ArrayNodeDefinition $rootNode)
+    {
+        $rootNode
             ->children()
-            ->scalarNode('key')
-            ->cannotBeEmpty()
-            ->isRequired()
-            ->end()
-            ->scalarNode('user_registry')
-            ->cannotBeEmpty()
-            ->isRequired()
-            ->end()
-            ->scalarNode('authorization_registry')
-            ->cannotBeEmpty()
-            ->isRequired()
-            ->end()
-            ->scalarNode('authentication_disabled')
-            ->defaultFalse()
-            ->info('Disable the authentication system')
-            ->end()
-            ->end()
-            ->end()
+                ->arrayNode('http')
+                    ->isRequired()
+                    ->children()
+                        ->scalarNode('action_argument_builder')
+                            ->cannotBeEmpty()
+                            ->isRequired()
+                        ->end()
+
+                    ->end()
+                ->end()
             ->end();
     }
 }

@@ -5,6 +5,7 @@ namespace Craft\Http\Controller;
 
 use Atompulse\Component\Domain\Data\DataContainerInterface;
 use Atompulse\Component\Domain\Data\Exception\PropertyValueNotValidException;
+use Craft\Http\Controller\Exception\ActionArgumentExceptionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -23,6 +24,10 @@ use Throwable;
 class ActionArgumentResolver implements ArgumentValueResolverInterface
 {
     /**
+     * @var ActionArgumentBuilderInterface
+     */
+    protected $argumentValidator;
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -34,14 +39,18 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
 
     /**
      * ActionArgumentResolver constructor.
-     *
      * @param LoggerInterface $logger
      * @param Security $security
+     * @param ActionArgumentBuilderInterface $argumentValidator
      */
-    public function __construct(LoggerInterface $logger, Security $security)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        Security $security,
+        ActionArgumentBuilderInterface $argumentValidator
+    ) {
         $this->logger = $logger;
         $this->security = $security;
+        $this->argumentValidator = $argumentValidator;
     }
 
     /**
@@ -100,19 +109,14 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
 //        }
 
         try {
-            /** @var DataContainerInterface $argRequest */
-            $argRequest = new $argClass();
-            $argRequest->fromArray($params, true, false);
+
+            $argRequest = $this->argumentValidator->build($params, $argClass);
 
             $this->logger->info("Resolved request object " . get_class($argRequest) . " (" . json_encode($argRequest->toArray()) . ") from input parameters", [$params]);
 
             yield $argRequest;
         } catch (Throwable $err) {
             $this->logger->info("Failed to instantiate request class [$argClass] ", ['exception' => $err]);
-
-            if ($err instanceof PropertyValueNotValidException) {
-                throw new Exception("Request object validation failed: {$err->getMessage()}");
-            }
 
             // stop execution at this point to avoid further expectation errors
             throw $err;

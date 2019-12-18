@@ -11,9 +11,11 @@ namespace Craft\Security\User;
 interface UserRegistryInterface
 {
     /**
-     * @param array $data
+     * @param UserDataInterface $userData
      * @param array $operations
      * @return SecurityUserInterface
      */
-    public function getUser(array $data, array $operations): SecurityUserInterface;
+    public function getUser(UserDataInterface $userData, array $operations): SecurityUserInterface;
+
+    public function getUserData(string $email, string $password): UserDataInterface;
 }

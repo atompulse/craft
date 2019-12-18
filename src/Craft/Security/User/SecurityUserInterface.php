@@ -13,9 +13,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 interface SecurityUserInterface extends UserInterface
 {
     /**
-     * @return array
+     * @return UserDataInterface
      */
-    public function getUserData(): array;
+    public function getUserData(): UserDataInterface;
 
     /**
      * @return string

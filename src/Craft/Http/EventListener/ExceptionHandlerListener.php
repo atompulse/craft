@@ -2,10 +2,12 @@
 
 namespace Craft\Http\EventListener;
 
+use Craft\Http\Controller\Exception\ActionArgumentException;
 use Craft\Messaging\Http\HttpStatusCodes;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -46,19 +48,28 @@ class ExceptionHandlerListener
         // Store logs
         $this->logger->error("Unexpected error occurred", [$error]);
 
-        if ($error instanceof AccessDeniedException) {
-            $status = HttpStatusCodes::AUTHORIZATION_ERROR;
-        } else {
-            if ($error instanceof NotFoundHttpException) {
+        $class = get_class($error);
+
+        $data = [];
+
+        switch ($class) {
+            case AccessDeniedException::class :
+                $status = HttpStatusCodes::AUTHORIZATION_ERROR;
+                break;
+            case ActionArgumentException::class :
+                $status = HttpStatusCodes::INVALID_INPUT_ERROR;
+                $data['errors'] = $error->getArgumentsErrors();
+                break;
+            case NotFoundHttpException::class :
+            case MethodNotAllowedHttpException::class :
                 $status = HttpStatusCodes::INVALID_RESOURCE_ERROR;
-            } else {
+                break;
+            default:
                 $status = HttpStatusCodes::UNEXPECTED_ERROR;
-            }
+                break;
         }
 
-        $data = [
-            'status' => HttpStatusCodes::getName($status)
-        ];
+        $data['status'] = HttpStatusCodes::getName($status);
 
         if (!$this->isProduction) {
             $data['debug'] = [

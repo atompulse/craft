@@ -11,7 +11,7 @@ namespace Craft\Security\User;
 class SecurityUser implements SecurityUserInterface
 {
     /**
-     * @var array
+     * @var UserDataInterface
      */
     protected $userData = [];
 
@@ -20,16 +20,16 @@ class SecurityUser implements SecurityUserInterface
      */
     protected $operations = [];
 
-    public function __construct(array $userData, array $operations)
+    public function __construct(UserDataInterface $userData, array $operations)
     {
         $this->userData = $userData;
         $this->operations = array_merge($this->operations, $operations);
     }
 
     /**
-     * @return array
+     * @return UserDataInterface
      */
-    public function getUserData(): array
+    public function getUserData(): UserDataInterface
     {
         return $this->userData;
     }

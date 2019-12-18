@@ -2,8 +2,8 @@
 
 namespace Craft\Http\EventListener;
 
-use Atompulse\Component\Domain\Data\DataContainerInterface;
 use Craft\Messaging\Http\HttpStatusCodes;
+use Craft\Messaging\ResponseInterface;
 use Craft\Messaging\Service\ServiceStatusCodes;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,27 +29,53 @@ class ResponseHandlerListener
     }
 
     /**
-     * @param DataContainerInterface $dto
+     * @param ResponseInterface $dto
      * @return Response
      */
-    protected function assemble(DataContainerInterface $dto): Response
+    protected function assemble(ResponseInterface $dto): Response
     {
-        $data = [];
+
+        $data = [
+            'status' => ServiceStatusCodes::UNEXPECTED_ERROR
+        ];
 
         if ($dto !== null) {
+
             $normalizedData = $dto->normalizeData();
-            [$status, $errors] = $normalizedData;
-            unset($normalizedData['status']);
-            unset($normalizedData['errors']);
-            $data['payload'] = $normalizedData;
+
+            ['status' => $status, 'errors' => $errors] = $normalizedData;
+
             $data['status'] = $status;
 
-            if ($data['status'] !== ServiceStatusCodes::OK) {
+
+//            var_dump($dto);die;
+
+            switch ($status) {
+                case ServiceStatusCodes::OK :
+                    unset($normalizedData['status']);
+                    unset($normalizedData['errors']);
+                    $data['payload'] = $normalizedData;
+                    break;
+                case ServiceStatusCodes::NO_RESULTS :
+                    break;
+                default:
+                    break;
+            }
+
+            if ($errors && $status !== ServiceStatusCodes::OK && $status !==ServiceStatusCodes::NO_RESULTS) {
                 $data['errors'] = $errors;
             }
+
+//            if (!$this->isProduction) {
+//                $data['debug'] = [
+//                    'message' => $error->getMessage(),
+//                    'file' => $error->getFile(),
+//                    'trace' => $error->getTraceAsString()
+//                ];
+//            }
         }
 
-        return new JsonResponse($data, HttpStatusCodes::getCode($status));
+        return new JsonResponse($data, HttpStatusCodes::getCode($data['status']));
     }
 
 }
