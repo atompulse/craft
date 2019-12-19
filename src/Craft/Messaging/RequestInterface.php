@@ -3,6 +3,7 @@
 namespace Craft\Messaging;
 
 use Atompulse\Component\Domain\Data\DataContainerInterface;
+use Craft\Data\Validation\DataValidatorInterface;
 
 /**
  * Interface RequestInterface
@@ -10,7 +11,7 @@ use Atompulse\Component\Domain\Data\DataContainerInterface;
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  */
-interface RequestInterface extends DataContainerInterface
+interface RequestInterface extends DataContainerInterface, DataValidatorInterface
 {
 
 }

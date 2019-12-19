@@ -33,6 +33,10 @@ class CraftExtension extends Extension
         $configValue = $config['security']['user_registry'];
         $container->setAlias('craft.security.authorization.user_registry', $configValue);
 
+        // add alias for UserDataInterface
+        $configValue = $config['security']['user_data'];
+        $container->setParameter('craft.security.user_data', $configValue);
+
         // add alias for ActionArgumentBuilderInterface
         $configValue = $config['http']['action_argument_builder'];
         $container->setAlias('craft.http.controller.action_argument_builder', $configValue);

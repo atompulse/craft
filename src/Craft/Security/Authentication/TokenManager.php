@@ -4,6 +4,7 @@ namespace Craft\Security\Authentication;
 
 use Craft\Security\Authentication\Exceptions\TokenValidationException;
 
+use Craft\Security\User\UserDataInterface;
 use Exception;
 use ParagonIE\Paseto\Builder;
 use ParagonIE\Paseto\Exception\RuleViolation;
@@ -42,15 +43,16 @@ class TokenManager implements TokenManagerInterface
     }
 
     /**
-     * @param array $data
+     * @param UserDataInterface $data
      * @param string $lifetime
      * @return string
      */
-    public function generateTemporaryToken(array $data, string $lifetime): string
+    public function generateTemporaryToken(UserDataInterface $data, string $lifetime): string
     {
         $sharedKey = new SymmetricKey($this->secretKey, new Version2());
 
-        $data['expires'] = $lifetime;
+        $data->expires = true;
+        $data->expireDate = $lifetime;
 
         $token = (new Builder())
             ->setKey($sharedKey)
@@ -58,20 +60,20 @@ class TokenManager implements TokenManagerInterface
             ->setPurpose(Purpose::local())
             ->setIssuer('CRAFT')
             // store data
-            ->setClaims($data);
+            ->setClaims($data->toArray());
 
         return $token->toString();
     }
 
     /**
-     * @param array $data
+     * @param UserDataInterface $data
      * @return string
      */
-    public function generateToken(array $data): string
+    public function generateToken(UserDataInterface $data): string
     {
         $sharedKey = new SymmetricKey($this->secretKey, new Version2());
 
-        $data['expires'] = false;
+        $data->expires = false;
 
         $token = (new Builder())
             ->setKey($sharedKey)
@@ -79,7 +81,7 @@ class TokenManager implements TokenManagerInterface
             ->setPurpose(Purpose::local())
             ->setIssuer('CRAFT')
             // store data
-            ->setClaims($data);
+            ->setClaims($data->toArray());
 
         return $token->toString();
     }
@@ -88,6 +90,9 @@ class TokenManager implements TokenManagerInterface
     /**
      * @param string $providedToken
      * @return JsonToken
+     * @throws PasetoException
+     * @throws \ParagonIE\Paseto\Exception\InvalidPurposeException
+     * @throws \ParagonIE\Paseto\Exception\InvalidVersionException
      */
     public function decodeToken(string $providedToken): JsonToken
     {

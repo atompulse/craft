@@ -30,7 +30,7 @@ class ServiceResponse implements ResponseInterface
 
     public function getStatus(): string
     {
-        return $this->properties['status'] ?? null;
+        return $this->properties['status'] ?? ServiceStatusCodes::OK;
     }
 
     public function getErrors(): ?array

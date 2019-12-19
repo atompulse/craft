@@ -12,6 +12,10 @@ use Atompulse\Component\Domain\Data\DataContainerInterface;
  */
 interface UserDataInterface extends DataContainerInterface
 {
+    public function getExpireDate(): string;
+
+    public function getExpires(): bool;
+
     public function getId(): string;
 
     public function getEmail(): string;

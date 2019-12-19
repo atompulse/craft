@@ -31,15 +31,21 @@ class SecurityUserProvider implements SecurityUserProviderInterface
      * @var UserRegistryInterface
      */
     protected $userRegistry;
+    /**
+     * @var string
+     */
+    protected $userDataClass;
 
     public function __construct(
         TokenManagerInterface $tokenManager,
         AuthorizationRegistryInterface $authorizationRegistry,
-        UserRegistryInterface $userRegistry
+        UserRegistryInterface $userRegistry,
+        $userDataClass
     ) {
         $this->authorizationRegistry = $authorizationRegistry;
         $this->tokenManager = $tokenManager;
         $this->userRegistry = $userRegistry;
+        $this->userDataClass = $userDataClass;
     }
 
     /**
@@ -48,20 +54,25 @@ class SecurityUserProvider implements SecurityUserProviderInterface
      */
     public function getUserFromToken(string $token): SecurityUserInterface
     {
-        $data = $this->getTokenData($token);
+        /** @var UserDataInterface $userData */
+        $userData = $this->getTokenData($token);
 
-        $operations = $this->authorizationRegistry->getRoleOperationsList($data['role']);
+        $operations = $this->authorizationRegistry->getRoleOperationsList($userData->getRole());
 
-        return $this->userRegistry->getUser($data, $operations);
+        return $this->userRegistry->getUser($userData, $operations);
     }
 
     /**
      * @param string $token
-     * @return array
+     * @return UserDataInterface
      */
-    protected function getTokenData(string $token): array
+    protected function getTokenData(string $token): UserDataInterface
     {
-        return $this->tokenManager->decodeToken($token)->getClaims();
+        $rawData = $this->tokenManager->decodeToken($token)->getClaims();
+        $factory = new \ReflectionClass($this->userDataClass);
+        $userData = $factory->newInstance($rawData);
+
+        return $userData;
     }
 
     /**
@@ -73,8 +84,8 @@ class SecurityUserProvider implements SecurityUserProviderInterface
     {
         $data = $this->getTokenData($token);
 
-        if ($data['expires']) {
-            $expirationDate = new DateTime($data['expires']);
+        if ($data->getExpires()) {
+            $expirationDate = new DateTime($data->getExpireDate());
 
             return $expirationDate < (new DateTime());
         }

@@ -21,6 +21,8 @@ trait UserDataTrait
 
     public function __construct(array $data = null)
     {
+        $this->defineProperty('expires', ['bool']);
+        $this->defineProperty('expireDate', ['string', 'null']);
         $this->defineProperty('id', ['string']);
         $this->defineProperty('email', ['string']);
         $this->defineProperty('role', ['string']);
@@ -28,6 +30,16 @@ trait UserDataTrait
         if ($data !== null) {
             $this->fromArray($data);
         }
+    }
+
+    public function getExpires(): bool
+    {
+        return $this->properties['expires'] ?? null;
+    }
+
+    public function getExpireDate(): string
+    {
+        return $this->properties['expireDate'] ?? null;
     }
 
     public function getId(): string

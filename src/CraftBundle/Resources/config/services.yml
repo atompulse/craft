@@ -9,6 +9,7 @@ services:
       - '@Craft\Security\Authentication\TokenManagerInterface'
       - '@Craft\Security\Authorization\AuthorizationRegistryInterface'
       - '@Craft\Security\User\UserRegistryInterface'
+      - '%craft.security.user_data%'
 
 
   Craft\Security\Authentication\TokenAuthenticatorInterface: '@craft.security.authentication.token_authenticator'

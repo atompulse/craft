@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Craft\Http\Controller;
 
-use Atompulse\Component\Domain\Data\DataContainerInterface;
-use Atompulse\Component\Domain\Data\Exception\PropertyValueNotValidException;
-use Craft\Http\Controller\Exception\ActionArgumentExceptionInterface;
+use Craft\Messaging\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
@@ -26,7 +24,7 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
     /**
      * @var ActionArgumentBuilderInterface
      */
-    protected $argumentValidator;
+    protected $argumentBuilder;
     /**
      * @var LoggerInterface
      */
@@ -41,16 +39,16 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
      * ActionArgumentResolver constructor.
      * @param LoggerInterface $logger
      * @param Security $security
-     * @param ActionArgumentBuilderInterface $argumentValidator
+     * @param ActionArgumentBuilderInterface $argumentBuilder
      */
     public function __construct(
         LoggerInterface $logger,
         Security $security,
-        ActionArgumentBuilderInterface $argumentValidator
+        ActionArgumentBuilderInterface $argumentBuilder
     ) {
         $this->logger = $logger;
         $this->security = $security;
-        $this->argumentValidator = $argumentValidator;
+        $this->argumentBuilder = $argumentBuilder;
     }
 
     /**
@@ -63,7 +61,7 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
         $argClass = $argument->getType();
         $classExists = class_exists($argClass);
 
-        $classImplementsInterface = in_array(ActionArgumentRequestInterface::class, class_implements($argClass));
+        $classImplementsInterface = in_array(RequestInterface::class, class_implements($argClass));
 
         return $classExists && $classImplementsInterface;
 
@@ -97,20 +95,13 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
         // resolve files
         if (count($request->files)) {
             $params['files'] = $request->files->all();
-        } else {
-            $params['files'] = null;
         }
 
         $this->logger->info("Resolving request object [$argClass] for [{$request->attributes->get('_controller')}]", ['params' => $params]);
 
-//        if ($user = $this->security->getUser()) {
-//            // inject user data into params
-//            $params['user'] = $user->getUserData();
-//        }
-
         try {
 
-            $argRequest = $this->argumentValidator->build($params, $argClass);
+            $argRequest = $this->argumentBuilder->build($params, $argClass);
 
             $this->logger->info("Resolved request object " . get_class($argRequest) . " (" . json_encode($argRequest->toArray()) . ") from input parameters", [$params]);
 
