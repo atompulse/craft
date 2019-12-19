@@ -77,7 +77,7 @@ trait DataValidatorTrait
                     break;
             }
 
-            // add nont blank validator for all fields without 'null'
+            // add not blank validator for all fields without 'null'
             if (!$nullable) {
                 $validatorConstraints[] = new \Symfony\Component\Validator\Constraints\NotBlank([]);
             }
