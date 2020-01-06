@@ -33,6 +33,18 @@ services:
       - '@Symfony\Component\Routing\RouterInterface'
       - '@Psr\Log\LoggerInterface'
 
+  Craft\Data\Validation\ArrayValidatorInterface: '@craft.data.validation.array_validator'
+  craft.data.validation.array_validator:
+    class: Craft\Data\Validation\ArrayValidator
+    arguments:
+      - '@Symfony\Component\Validator\Validator\ValidatorInterface'
+
+  Craft\Data\Validation\RequestValidatorInterface: '@craft.data.validation.request_validator'
+  craft.data.validation.request_validator:
+    class: Craft\Data\Validation\RequestValidator
+    arguments:
+      - '@Craft\Data\Validation\ArrayValidatorInterface'
+
   Craft\Security\Authorization\AuthorizationRegistryInterface: '@craft.security.authorization.authorization_registry'
 
   Craft\Http\Controller\ActionArgumentBuilderInterface: '@craft.http.controller.action_argument_builder'

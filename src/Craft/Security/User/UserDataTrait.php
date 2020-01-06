@@ -14,6 +14,8 @@ use Atompulse\Component\Domain\Data\DataContainer;
  * @property string id;
  * @property string email;
  * @property string role;
+ * @property bool expires;
+ * @property string expireDate;
  */
 trait UserDataTrait
 {

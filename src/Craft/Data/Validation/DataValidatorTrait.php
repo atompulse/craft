@@ -3,6 +3,7 @@
 namespace Craft\Data\Validation;
 
 use Doctrine\Common\Inflector\Inflector;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Trait DataValidatorTrait
@@ -32,6 +33,9 @@ trait DataValidatorTrait
 
     private function translateConstraints(array $constraints)
     {
+        $validatorConstraints = [];
+        $nullable = false;
+
         foreach ($constraints as $constraint => $args) {
 
             if (is_array($args)) {
@@ -42,46 +46,49 @@ trait DataValidatorTrait
                 $hasArguments = false;
             }
 
-            $nullable = false;
-
             switch ($constraintName) {
                 case 'string' :
-                    $validatorConstraints[] = new \Symfony\Component\Validator\Constraints\Type(['type' => 'string']);
+                    $validatorConstraints[] = new Assert\Type(['type' => 'string']);
                     break;
                 case 'int' :
                 case 'integer' :
                 case 'number' :
-                    $validatorConstraints[] = new \Symfony\Component\Validator\Constraints\Type(['type' => 'numeric']);
+                    $validatorConstraints[] = new Assert\Type(['type' => 'numeric']);
                     break;
                 case 'object' :
-                    $validatorConstraints[] = new \Symfony\Component\Validator\Constraints\Type(['type' => 'object']);
+                    $validatorConstraints[] = new Assert\Type(['type' => 'object']);
                     break;
                 case 'bool' :
-                    $validatorConstraints[] = new \Symfony\Component\Validator\Constraints\Type(['type' => 'bool']);
+                    $validatorConstraints[] = new Assert\Type(['type' => 'bool']);
                     break;
                 case 'null' :
-                    $validatorConstraints[] = new \Symfony\Component\Validator\Constraints\NotBlank(['allowNull' => true]);
+                    $validatorConstraints[] = new Assert\NotBlank(['allowNull' => true]);
                     $nullable = true;
                     break;
                 default:
-                    $constraintClass = '\Symfony\Component\Validator\Constraints\\' . $this->buildConstraintName($constraintName);
 
-                    $factory = new \ReflectionClass($constraintClass);
-                    if ($hasArguments) {
-                        $constraintInstance = $factory->newInstance($args);
-                    } else {
-                        $constraintInstance = $factory->newInstance();
-                    }
+                    $refinedName = $this->buildConstraintName($constraintName);
 
-                    $validatorConstraints[] = $constraintInstance;
+                        // try to determine if its a symfony validator before giving up
+                        $constraintClass = '\Symfony\Component\Validator\Constraints\\' . $this->buildConstraintName($constraintName);
+
+                        $factory = new \ReflectionClass($constraintClass);
+                        if ($hasArguments) {
+                            $constraintInstance = $factory->newInstance($args);
+                        } else {
+                            $constraintInstance = $factory->newInstance();
+                        }
+
+                        $validatorConstraints[] = $constraintInstance;
+
+
                     break;
             }
+        }
 
-            // add not blank validator for all fields without 'null'
-            if (!$nullable) {
-                $validatorConstraints[] = new \Symfony\Component\Validator\Constraints\NotBlank([]);
-            }
-
+        // add "not blank" validator for non 'nullable' properties
+        if (!$nullable) {
+            $validatorConstraints[] = new Assert\NotBlank();
         }
 
         return $validatorConstraints;

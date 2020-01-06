@@ -12,5 +12,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 interface DataValidatorInterface
 {
+    /**
+     * A list of
+     * @return array
+     */
     public function getValidatorConstraints(): array;
 }

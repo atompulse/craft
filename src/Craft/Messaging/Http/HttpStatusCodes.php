@@ -52,12 +52,12 @@ class HttpStatusCodes
         $constants = (new ReflectionClass(__CLASS__))->getConstants();
 
         foreach ($constants as $name => $value) {
-            if ($status === $name) {
+            if ($status === $name || "{$status}_ERROR" === $name) {
                 return $value;
             }
         }
 
-        throw new RuntimeException("[$status] is not defined");
+        throw new RuntimeException("HttpStatusCodes status [$status] is not defined");
     }
 
     /**
@@ -74,7 +74,7 @@ class HttpStatusCodes
             }
         }
 
-        throw new RuntimeException("[$code] is not defined");
+        throw new RuntimeException("HttpStatusCodes code [$code] is not defined");
     }
 
 }
