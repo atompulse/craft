@@ -21,7 +21,5 @@ class ServiceError implements DataContainerInterface
     {
         $this->defineProperty('message', ['string'], $message);
         $this->defineProperty('context', ['string', 'null'], $context);
-
-
     }
 }

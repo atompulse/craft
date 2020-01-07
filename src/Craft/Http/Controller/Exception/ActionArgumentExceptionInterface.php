@@ -12,6 +12,14 @@ use Craft\Messaging\Service\ServiceError;
  */
 interface ActionArgumentExceptionInterface
 {
+    /**
+     * @return array
+     */
     public function getArgumentsErrors(): array;
+
+    /**
+     * @param ServiceError $error
+     * @return mixed
+     */
     public function addError(ServiceError $error);
 }

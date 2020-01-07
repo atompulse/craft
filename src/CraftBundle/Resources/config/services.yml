@@ -75,7 +75,9 @@ services:
 
   # Response output handler
   Craft\Http\EventListener\ResponseHandlerListener:
-    arguments: ['@logger']
+    arguments:
+      - '@logger'
+      - "%craft.env%"
     tags:
       - { name: kernel.event_listener, event: kernel.view, method: build, priority: 255 }
 

@@ -17,6 +17,9 @@ class ActionArgumentException extends \Exception implements ActionArgumentExcept
      */
     protected $errors = [];
 
+    /**
+     * @return array
+     */
     public function getArgumentsErrors(): array
     {
         $errors = [];
@@ -27,6 +30,10 @@ class ActionArgumentException extends \Exception implements ActionArgumentExcept
         return $errors;
     }
 
+    /**
+     * @param ServiceError $error
+     * @return mixed|void
+     */
     public function addError(ServiceError $error)
     {
         $this->errors[] = $error;
