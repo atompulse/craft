@@ -15,7 +15,6 @@ use ParagonIE\Paseto\Keys\SymmetricKey;
 use ParagonIE\Paseto\Exception\PasetoException;
 use ParagonIE\Paseto\Parser;
 use ParagonIE\Paseto\Rules\IssuedBy;
-use ParagonIE\Paseto\Rules\NotExpired;
 use ParagonIE\Paseto\ProtocolCollection;
 use Psr\Log\LoggerInterface;
 
@@ -46,13 +45,18 @@ class TokenManager implements TokenManagerInterface
      * @param UserDataInterface $data
      * @param string $lifetime
      * @return string
+     * @throws PasetoException
+     * @throws \ParagonIE\Paseto\Exception\InvalidKeyException
+     * @throws \ParagonIE\Paseto\Exception\InvalidPurposeException
      */
     public function generateTemporaryToken(UserDataInterface $data, string $lifetime): string
     {
         $sharedKey = new SymmetricKey($this->secretKey, new Version2());
 
-        $data->expires = true;
-        $data->expireDate = $lifetime;
+        $claims = clone $data;
+
+        $claims->expires = true;
+        $claims->expireDate = $lifetime;
 
         $token = (new Builder())
             ->setKey($sharedKey)
@@ -60,7 +64,7 @@ class TokenManager implements TokenManagerInterface
             ->setPurpose(Purpose::local())
             ->setIssuer('CRAFT')
             // store data
-            ->setClaims($data->toArray());
+            ->setClaims($claims->toArray());
 
         return $token->toString();
     }
@@ -68,12 +72,16 @@ class TokenManager implements TokenManagerInterface
     /**
      * @param UserDataInterface $data
      * @return string
+     * @throws PasetoException
+     * @throws \ParagonIE\Paseto\Exception\InvalidKeyException
+     * @throws \ParagonIE\Paseto\Exception\InvalidPurposeException
      */
     public function generateToken(UserDataInterface $data): string
     {
         $sharedKey = new SymmetricKey($this->secretKey, new Version2());
 
-        $data->expires = false;
+        $claims = clone $data;
+        $claims->expires = false;
 
         $token = (new Builder())
             ->setKey($sharedKey)
@@ -81,11 +89,10 @@ class TokenManager implements TokenManagerInterface
             ->setPurpose(Purpose::local())
             ->setIssuer('CRAFT')
             // store data
-            ->setClaims($data->toArray());
+            ->setClaims($claims->toArray());
 
         return $token->toString();
     }
-
 
     /**
      * @param string $providedToken

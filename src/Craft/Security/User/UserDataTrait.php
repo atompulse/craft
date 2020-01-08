@@ -11,7 +11,7 @@ use Atompulse\Component\Domain\Data\DataContainer;
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *
- * @property string id;
+ * @property int id;
  * @property string email;
  * @property string role;
  * @property bool expires;
@@ -25,7 +25,7 @@ trait UserDataTrait
     {
         $this->defineProperty('expires', ['bool']);
         $this->defineProperty('expireDate', ['string', 'null']);
-        $this->defineProperty('id', ['string']);
+        $this->defineProperty('id', ['int']);
         $this->defineProperty('email', ['string']);
         $this->defineProperty('role', ['string']);
 
@@ -44,7 +44,7 @@ trait UserDataTrait
         return $this->properties['expireDate'] ?? null;
     }
 
-    public function getId(): string
+    public function getId(): int
     {
         return $this->properties['id'] ?? null;
     }

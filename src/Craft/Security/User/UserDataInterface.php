@@ -16,7 +16,7 @@ interface UserDataInterface extends DataContainerInterface
 
     public function getExpires(): bool;
 
-    public function getId(): string;
+    public function getId(): int;
 
     public function getEmail(): string;
 
