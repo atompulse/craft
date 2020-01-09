@@ -81,7 +81,10 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
             throw new Exception("A valid controller is missing from the request");
         }
 
-        // extract params from request
+        // get route params
+        $routeParams = $request->attributes->get('_route_params');
+
+        // extract params from query/request
         switch ($request->getMethod()) {
             case 'GET' :
                 $params = $request->query->all();
@@ -91,6 +94,8 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
                 $params = $request->request->all();
                 break;
         }
+
+        $params = array_merge($params, $routeParams);
 
         // resolve files
         if (count($request->files)) {
