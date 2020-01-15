@@ -4,6 +4,8 @@ namespace Craft\Http\EventListener;
 
 use Craft\Http\Controller\Exception\ActionArgumentException;
 use Craft\Messaging\Http\HttpStatusCodes;
+use Craft\Security\Authentication\Exception\TokenAuthenticatorException;
+use Craft\Security\Authentication\Exception\TokenParserException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -43,29 +45,36 @@ class ExceptionHandlerListener
     public function onKernelException(ExceptionEvent $event)
     {
         // Get the exception object from the event
-        $error = $event->getThrowable();
+        $exception = $event->getThrowable();
 
-        // Store logs
-        $this->logger->error("Unexpected error occurred", [$error]);
-
-        $class = get_class($error);
+        $class = get_class($exception);
 
         $data = [];
 
         switch ($class) {
+            case TokenAuthenticatorException::class :
+            case TokenParserException::class :
+                $status = HttpStatusCodes::AUTHENTICATION_ERROR;
+                $data['errors'] = $exception->getErrors();
+                $this->logger->error(HttpStatusCodes::getName($status) . " error occurred", [$exception]);
+                break;
             case AccessDeniedException::class :
                 $status = HttpStatusCodes::AUTHORIZATION_ERROR;
+                $this->logger->error(HttpStatusCodes::getName($status) . " error occurred", [$exception]);
                 break;
             case ActionArgumentException::class :
                 $status = HttpStatusCodes::INVALID_INPUT_ERROR;
-                $data['errors'] = $error->getArgumentsErrors();
+                $data['errors'] = $exception->getErrors();
+                $this->logger->error(HttpStatusCodes::getName($status) . " error occurred", [$data['errors']]);
                 break;
             case NotFoundHttpException::class :
             case MethodNotAllowedHttpException::class :
                 $status = HttpStatusCodes::INVALID_RESOURCE_ERROR;
+                $this->logger->error(HttpStatusCodes::getName($status) . " error occurred", [$exception]);
                 break;
             default:
                 $status = HttpStatusCodes::UNEXPECTED_ERROR;
+                $this->logger->error("Unexpected error occurred", [$exception]);
                 break;
         }
 
@@ -73,9 +82,10 @@ class ExceptionHandlerListener
 
         if (!$this->isProduction) {
             $data['debug'] = [
-                'message' => $error->getMessage(),
-                'file' => $error->getFile(),
-                'trace' => $error->getTraceAsString()
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString()
             ];
         }
 
