@@ -2,7 +2,7 @@
 
 namespace Craft\Security\Authentication;
 
-use Craft\Security\Authentication\Exceptions\TokenValidationException;
+use Craft\Security\Authentication\Exception\TokenParserException;
 
 use Craft\Security\User\UserDataInterface;
 use Exception;
@@ -128,7 +128,7 @@ class TokenManager implements TokenManagerInterface
                 $this->logger->critical('Failed to decode token', ['error' => $err]);
             }
 
-            throw new TokenValidationException("Token not valid");
+            throw ((new TokenParserException('Token invalid'))->addError(new TokenAuthenticatorError('Token invalid', TokenKey::HEADER_NAME)));
         }
 
         return $token;

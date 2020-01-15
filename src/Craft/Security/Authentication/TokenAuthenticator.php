@@ -2,14 +2,12 @@
 
 namespace Craft\Security\Authentication;
 
-use Craft\Messaging\Http\HttpStatusCodes;
-use Craft\Security\User\SecurityUser;
+use Craft\Security\Authentication\Exception\TokenAuthenticatorException;
 use Craft\Security\User\SecurityUserInterface;
 use Craft\Security\User\SecurityUserProvider;
 use Craft\Security\User\SecurityUserProviderInterface;
+
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -91,11 +89,17 @@ class TokenAuthenticator extends AbstractGuardAuthenticator implements TokenAuth
     public function getSecurityUser(string $token): SecurityUserInterface
     {
         if (strlen($token) === 0) {
-            throw new AuthenticationException('Authentication token required', self::AUTH_TOKEN_MISSING);
+            $exception = new TokenAuthenticatorException('Authentication token required');
+            $exception->addError(new TokenAuthenticatorError('Authentication token required', TokenKey::HEADER_NAME));
+
+            throw $exception;
         }
 
         if ($this->securityUserProvider->isTokenExpired($token)) {
-            throw new AuthenticationException('Authentication token expired', self::AUTH_TOKEN_EXPIRED);
+            $exception = new TokenAuthenticatorException('Authentication token expired');
+            $exception->addError(new TokenAuthenticatorError('Authentication token expired', TokenKey::HEADER_NAME));
+
+            throw $exception;
         }
 
         return $this->securityUserProvider->getUserFromToken($token);
@@ -124,7 +128,7 @@ class TokenAuthenticator extends AbstractGuardAuthenticator implements TokenAuth
      * @param Request $request
      * @param TokenInterface $token
      * @param string $providerKey
-     * @return Response|null
+     * @return null
      */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
@@ -135,35 +139,25 @@ class TokenAuthenticator extends AbstractGuardAuthenticator implements TokenAuth
     /**
      * @param Request $request
      * @param AuthenticationException $exception
-     * @return JsonResponse|Response|null
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        $data = [
-            'code' => $exception->getCode(),
-            'msg' => $exception->getMessage()
-        ];
-
-        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
+        throw $exception;
     }
 
     /**
      * Called if the client accesses a URI/resource that requires authentication,
      * but no authentication details were sent.
      * Should return a Response object that helps the user authenticate (e.g. a 401 response that says "token is missing!").
-     *
      * @param Request $request
      * @param AuthenticationException|null $authException
-     * @return JsonResponse|Response
      */
     public function start(Request $request, AuthenticationException $authException = null)
     {
-        $data = [
-            'code' => $authException->getCode(),
-            'msg' => 'Authentication Required'
-        ];
+        $exception = new TokenAuthenticatorException('Authentication Required');
+        $exception->addError(new TokenAuthenticatorError('Authentication Required', TokenKey::HEADER_NAME));
 
-        return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
+        throw $exception;
     }
 
     public function supportsRememberMe(): bool
