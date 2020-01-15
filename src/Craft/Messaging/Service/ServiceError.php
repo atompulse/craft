@@ -2,8 +2,7 @@
 
 namespace Craft\Messaging\Service;
 
-use Atompulse\Component\Domain\Data\DataContainer;
-use Atompulse\Component\Domain\Data\DataContainerInterface;
+use Craft\Exception\ContextualError;
 
 /**
  * Class ServiceError
@@ -13,13 +12,7 @@ use Atompulse\Component\Domain\Data\DataContainerInterface;
  *
  * @property string $message
  */
-class ServiceError implements DataContainerInterface
+class ServiceError extends ContextualError
 {
-    use DataContainer;
 
-    public function __construct(string $message, string $context = '')
-    {
-        $this->defineProperty('message', ['string'], $message);
-        $this->defineProperty('context', ['string', 'null'], $context);
-    }
 }
