@@ -2,7 +2,7 @@
 
 namespace Craft\Http\Controller\Exception;
 
-use Craft\Messaging\Service\ServiceError;
+use Craft\Exception\ContextualExceptionInterface;
 
 /**
  * Interface ActionArgumentExceptionInterface
@@ -10,16 +10,7 @@ use Craft\Messaging\Service\ServiceError;
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  */
-interface ActionArgumentExceptionInterface
+interface ActionArgumentExceptionInterface extends ContextualExceptionInterface
 {
-    /**
-     * @return array
-     */
-    public function getArgumentsErrors(): array;
 
-    /**
-     * @param ServiceError $error
-     * @return mixed
-     */
-    public function addError(ServiceError $error);
 }

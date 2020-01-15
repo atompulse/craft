@@ -2,7 +2,7 @@
 
 namespace Craft\Http\Controller\Exception;
 
-use Craft\Messaging\Service\ServiceError;
+use Craft\Exception\ContextualExceptionTrait;
 
 /**
  * Class ActionArgumentException
@@ -12,30 +12,5 @@ use Craft\Messaging\Service\ServiceError;
  */
 class ActionArgumentException extends \Exception implements ActionArgumentExceptionInterface
 {
-    /**
-     * @var array
-     */
-    protected $errors = [];
-
-    /**
-     * @return array
-     */
-    public function getArgumentsErrors(): array
-    {
-        $errors = [];
-        foreach ($this->errors as $error) {
-            $errors[] = $error->normalizeData();
-        }
-
-        return $errors;
-    }
-
-    /**
-     * @param ServiceError $error
-     * @return mixed|void
-     */
-    public function addError(ServiceError $error)
-    {
-        $this->errors[] = $error;
-    }
+    use ContextualExceptionTrait;
 }
