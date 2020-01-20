@@ -1,0 +1,2 @@
+http:
+  action_argument_builder: 'Craft\Http\Controller\ActionArgumentBuilder'

@@ -1,0 +1,44 @@
+services:
+
+  Craft\Security\User\UserRegistryInterface: '@craft.security.authorization.user_registry'
+
+  Craft\Security\Authorization\AuthorizationRegistryInterface: '@craft.security.authorization.authorization_registry'
+
+  Craft\Security\User\SecurityUserProviderInterface: '@craft.security.user.provider'
+  craft.security.user.provider:
+    class: Craft\Security\User\SecurityUserProvider
+    arguments:
+      - '@Craft\Security\Authentication\TokenManagerInterface'
+      - '@Craft\Security\Authorization\AuthorizationRegistryInterface'
+      - '@Craft\Security\User\UserRegistryInterface'
+      - '%craft.security.user_data%'
+
+
+  Craft\Security\Authentication\TokenAuthenticatorInterface: '@craft.security.authentication.token_authenticator'
+  craft.security.authentication.token_authenticator:
+    class: Craft\Security\Authentication\TokenAuthenticator
+    arguments:
+      - '@Craft\Security\User\SecurityUserProviderInterface'
+
+  Craft\Security\Authentication\TokenManagerInterface: '@craft.security.authentication.token_manager'
+  craft.security.authentication.token_manager:
+    class: Craft\Security\Authentication\TokenManager
+    arguments:
+      - '%craft.security.key%'
+      - '@Psr\Log\LoggerInterface'
+
+  Craft\Security\Authorization\RoutesAuthorizationRegistryInterface: '@craft.security.authorization.routes_registry'
+  craft.security.authorization.routes_registry:
+    class: Craft\Security\Authorization\RoutesAuthorizationRegistry
+    arguments:
+      - '@Symfony\Component\Routing\RouterInterface'
+      - '@Psr\Log\LoggerInterface'
+
+  # Authorization system voter
+  Craft\Security\Authorization\RbacAuthorizer:
+    arguments:
+      - '@security.helper'
+      - '@Craft\Security\Authorization\RoutesAuthorizationRegistryInterface'
+      - '@Psr\Log\LoggerInterface'
+    tags:
+      - { name: security.voter }
