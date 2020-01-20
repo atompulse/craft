@@ -12,5 +12,9 @@ use Craft\Messaging\RequestInterface;
  */
 interface RequestValidatorInterface
 {
-    public function validate(RequestInterface $object): array;
+    /**
+     * @param RequestInterface $request
+     * @return array
+     */
+    public function validate(RequestInterface $request): array;
 }

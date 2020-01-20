@@ -3,8 +3,6 @@
 namespace Craft\Data\Validation;
 
 use Craft\Messaging\RequestInterface;
-use Craft\Messaging\Service\ServiceError;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class RequestValidator
@@ -28,8 +26,8 @@ class RequestValidator implements RequestValidatorInterface
      * @param RequestInterface $object
      * @return array
      */
-    public function validate(RequestInterface $object): array
+    public function validate(RequestInterface $request): array
     {
-        return $this->validator->validate($object->normalizeData(), $object->getValidatorConstraints());
+        return $this->validator->validate($request->normalizeData(), $request->getValidatorConstraints());
     }
 }
