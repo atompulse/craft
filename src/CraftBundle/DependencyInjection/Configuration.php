@@ -5,6 +5,7 @@ namespace CraftBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class Configuration
@@ -15,65 +16,78 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     /**
+     * @var array
+     */
+    protected $defaults = [];
+
+    /**
      * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('craft');
 
-        $this->addSecurityConfiguration($treeBuilder->getRootNode());
+        // load bundle defaults that can be overwritten by the application
+        $this->defaults = Yaml::parse(file_get_contents(__DIR__ . '/../Resources/config/config.defaults.yaml'));
 
-        $this->addHttpConfiguration($treeBuilder->getRootNode());
+        $treeBuilder->getRootNode()->append($this->addSecurityConfiguration());
+        $treeBuilder->getRootNode()->append($this->addHttpConfiguration());
 
         return $treeBuilder;
     }
 
-    protected function addSecurityConfiguration(ArrayNodeDefinition $rootNode)
+    /**
+     * @return ArrayNodeDefinition
+     */
+    protected function addSecurityConfiguration(): ArrayNodeDefinition
     {
-        $rootNode
+        $node = (new TreeBuilder('security'))->getRootNode();
+
+        $node
+            ->isRequired()
             ->children()
-                ->arrayNode('security')
-                    ->isRequired()
-                    ->children()
-                        ->scalarNode('key')
-                            ->cannotBeEmpty()
-                            ->isRequired()
-                        ->end()
-                        ->scalarNode('user_registry')
-                            ->cannotBeEmpty()
-                            ->isRequired()
-                        ->end()
-                        ->scalarNode('user_data')
-                            ->cannotBeEmpty()
-                            ->isRequired()
-                        ->end()
-                        ->scalarNode('authorization_registry')
-                            ->cannotBeEmpty()
-                            ->isRequired()
-                        ->end()
-                        ->scalarNode('authentication_disabled')
-                            ->defaultFalse()
-                            ->info('Disable the authentication system')
-                        ->end()
-                    ->end()
-                ->end()
+            ->scalarNode('key')
+            ->cannotBeEmpty()
+            ->isRequired()
+            ->end()
+            ->scalarNode('user_registry')
+            ->cannotBeEmpty()
+            ->isRequired()
+            ->end()
+            ->scalarNode('user_data')
+            ->cannotBeEmpty()
+            ->isRequired()
+            ->end()
+            ->scalarNode('authorization_registry')
+            ->cannotBeEmpty()
+            ->isRequired()
+            ->end()
+            ->scalarNode('authentication_disabled')
+            ->defaultFalse()
+            ->info('Disable the authentication system')
+            ->end()
             ->end();
+
+        return $node;
     }
 
-    protected function addHttpConfiguration(ArrayNodeDefinition $rootNode)
+    /**
+     * @return ArrayNodeDefinition
+     */
+    protected function addHttpConfiguration(): ArrayNodeDefinition
     {
-        $rootNode
-            ->children()
-                ->arrayNode('http')
-                    ->isRequired()
-                    ->children()
-                        ->scalarNode('action_argument_builder')
-                            ->cannotBeEmpty()
-                            ->isRequired()
-                        ->end()
+        $node = (new TreeBuilder('http'))->getRootNode();
 
-                    ->end()
-                ->end()
+        $node
+            ->isRequired()
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->scalarNode('action_argument_builder')
+            ->cannotBeEmpty()
+            ->defaultValue($this->defaults['http']['action_argument_builder'])
+            ->end()
             ->end();
+
+        return $node;
     }
 }

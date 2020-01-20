@@ -42,8 +42,7 @@ class CraftExtension extends Extension
         $container->setAlias('craft.http.controller.action_argument_builder', $configValue);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.yml');
-
+        $loader->load('services.yaml');
 
     }
 }
