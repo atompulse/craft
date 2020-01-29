@@ -2,8 +2,8 @@
 
 namespace Craft\Security\Authorization\Registry;
 
-use Atompulse\Component\Domain\Data\DataContainer;
-use Atompulse\Component\Domain\Data\DataContainerInterface;
+use Craft\Data\Container\DataContainerInterface;
+use Craft\Data\Container\DataContainerTrait;
 
 /**
  * Class RbacRole
@@ -16,7 +16,7 @@ use Atompulse\Component\Domain\Data\DataContainerInterface;
  */
 class RbacRole implements DataContainerInterface
 {
-    use DataContainer;
+    use DataContainerTrait;
 
     public function __construct(array $data = null)
     {

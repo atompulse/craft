@@ -2,7 +2,7 @@
 
 namespace Craft\Messaging;
 
-use Atompulse\Component\Domain\Data\DataContainerInterface;
+use Craft\Data\Container\DataContainerInterface;
 use Craft\Messaging\Service\ServiceError;
 
 /**

@@ -2,7 +2,7 @@
 
 namespace Craft\Exception;
 
-use Atompulse\Component\Domain\Data\DataContainer;
+use Craft\Data\Container\DataContainerTrait;
 
 /**
  * Class ContextualError
@@ -16,7 +16,7 @@ use Atompulse\Component\Domain\Data\DataContainer;
  */
 class ContextualError implements ContextualErrorInterface
 {
-    use DataContainer;
+    use DataContainerTrait;
 
     /**
      * ContextualError constructor.

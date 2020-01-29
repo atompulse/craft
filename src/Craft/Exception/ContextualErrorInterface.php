@@ -2,7 +2,7 @@
 
 namespace Craft\Exception;
 
-use Atompulse\Component\Domain\Data\DataContainerInterface;
+use Craft\Data\Container\DataContainerInterface;
 
 /**
  * Interface ContextualErrorInterface

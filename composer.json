@@ -23,7 +23,7 @@
   "require": {
     "php": "^7.2",
     "ext-json": "*",
-    "atompulse/domain": "^1.1",
+    "ext-intl": "*",
     "doctrine/annotations": "1.8.*",
     "doctrine/inflector": "^1.3",
     "paragonie/paseto": "^1.0",
