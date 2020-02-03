@@ -402,12 +402,12 @@ trait DataContainerTrait
      * - handles default value resolution
      * - handles DataContainerInterface property values normalization
      * - return simple array with key->value OR multidimensional array with key->array but never object values
+     *
      * @param string|null $property Normalize a specific property of the container
-     * @return array|mixed
+     * @return array
      * @throws PropertyNotValidException
-     * @throws PropertyValueNormalizationException
      */
-    public function normalizeData(string $property = null)
+    public function normalizeData(string $property = null): array
     {
         $data = [];
 
