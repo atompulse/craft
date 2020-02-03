@@ -2,7 +2,7 @@
 
 namespace Craft\Messaging\Service;
 
-use Atompulse\Component\Domain\Data\DataContainer;
+use Craft\Data\Container\DataContainerTrait;
 use Craft\Messaging\ResponseInterface;
 
 /**
@@ -16,7 +16,7 @@ use Craft\Messaging\ResponseInterface;
  */
 class ServiceResponse implements ResponseInterface
 {
-    use DataContainer;
+    use DataContainerTrait;
 
     public function __construct(array $data = null)
     {

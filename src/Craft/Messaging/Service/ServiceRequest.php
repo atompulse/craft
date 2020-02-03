@@ -2,7 +2,7 @@
 
 namespace Craft\Messaging\Service;
 
-use Atompulse\Component\Domain\Data\DataContainer;
+use Craft\Data\Container\DataContainerTrait;
 use Craft\Data\Validation\DataValidatorTrait;
 use Craft\Http\Controller\ActionArgumentRequestInterface;
 
@@ -14,6 +14,6 @@ use Craft\Http\Controller\ActionArgumentRequestInterface;
  */
 class ServiceRequest implements ActionArgumentRequestInterface
 {
-    use DataContainer;
+    use DataContainerTrait;
     use DataValidatorTrait;
 }

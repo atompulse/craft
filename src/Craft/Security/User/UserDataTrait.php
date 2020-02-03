@@ -2,8 +2,7 @@
 
 namespace Craft\Security\User;
 
-use Atompulse\Component\Domain\Data\DataContainer;
-
+use Craft\Data\Container\DataContainerTrait;
 
 /**
  * Class UserData
@@ -19,7 +18,7 @@ use Atompulse\Component\Domain\Data\DataContainer;
  */
 trait UserDataTrait
 {
-    use DataContainer;
+    use DataContainerTrait;
 
     public function __construct(array $data = null)
     {
