@@ -18,7 +18,7 @@ use DateTimeInterface;
 trait DataContainerTrait
 {
     /**
-     * @var array Array to describe the valid properties of container and its types
+     * @var array Store to describe the properties of the container and its types
      * @example:
      *   "code" => "integer|0",
      *   "name" => "string",
@@ -30,20 +30,20 @@ trait DataContainerTrait
     protected $validProperties = [];
 
     /**
-     * Default values specification
+     * Default values store
      * @var array
      */
     protected $defaultValues = [];
 
     /**
-     * @var array Array to store data of all valid properties.
+     * @var array Store values of all valid properties.
      */
     protected $properties = [];
 
     /**
      * @var string
      */
-    private $propertyNotValidErrorMessage = 'Property(ies) ["%s"] not valid for this class ["%s"]';
+    private $propertyNotValidErrorMessage = 'Property ["%s"] not valid for this class ["%s"]';
 
     /**
      * @inheritdoc
@@ -54,7 +54,7 @@ trait DataContainerTrait
     public function &__get(string $property)
     {
         if (!$this->isValidProperty($property)) {
-            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, __CLASS__));
+            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
         }
 
         $propertyValue = null;
@@ -81,13 +81,13 @@ trait DataContainerTrait
      * @param string $property
      * @param mixed $value Value of property
      * @return void
-     * @throws PropertyValueNotValidException Thrown if property value type is inconsistent with declaration
-     * @throws PropertyNotValidException Thrown if property is not defined into validProperties.
+     * @throws PropertyValueNotValidException Thrown if property valuetype is inconsistent
+     * @throws PropertyNotValidException Thrown if property is not defined in validProperties
      */
     public function __set(string $property, $value)
     {
         if (!$this->isValidProperty($property)) {
-            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, __CLASS__));
+            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
         }
 
         // Check if there's a specialized setter method
@@ -136,10 +136,18 @@ trait DataContainerTrait
      */
     private function getIntegritySpecification(string $property)
     {
-        $constraints = $this->validProperties[$property];
+        $allConstraints = $this->validProperties[$property];
 
-        if (!is_array($constraints)) {
-            $constraints = $this->parseIntegritySpecification($this->validProperties[$property]);
+        if (!is_array($allConstraints)) {
+            $constraints = $this->parseIntegritySpecification($allConstraints);
+        } else {
+            $constraints = [];
+            // extract only the `type` related constraints
+            foreach ($allConstraints as $key => $value) {
+                if (is_numeric($key)) {
+                    $constraints[] = $value;
+                }
+            }
         }
 
         return $constraints;
@@ -176,19 +184,25 @@ trait DataContainerTrait
 
         $actualValueType = gettype($value);
 
-        if ($actualValueType == 'double') {
+        if ($actualValueType === 'double') {
             $actualValueType = is_int($value) ? 'integer' : 'number';
         } else {
-            if ($actualValueType == 'NULL') {
+            if ($actualValueType === 'NULL') {
                 $actualValueType = 'null';
             }
         }
 
         if (count($integrityConstraints)) {
             // object check
-            if ($actualValueType == 'object') {
+            if ($actualValueType === 'object') {
                 if (!in_array(get_class($value), $integrityConstraints)) {
-                    throw new PropertyValueNotValidException("Type error: Property [$property] accepts only [" . implode(',', $integrityConstraints) . '], but given value is instance of : [' . get_class($value) . ']');
+                    throw new PropertyValueNotValidException(
+                        sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is instance of [%s]",
+                            get_class($this),
+                            $property,
+                            implode(',', $integrityConstraints),
+                            $value
+                        ));
                 }
             } else {
                 // primitive type value
@@ -197,28 +211,34 @@ trait DataContainerTrait
                     if ($type === 'object' && is_object($value)) {
                         $isValidType = true;
                         break;
-                    } elseif ($type == 'array' && is_array($value)) {
+                    } elseif ($type === 'array' && is_array($value)) {
                         $isValidType = true;
                         break;
-                    } elseif ($type == 'string' && is_string($value)) {
+                    } elseif ($type === 'string' && is_string($value)) {
                         $isValidType = true;
                         break;
-                    } elseif ($type == 'number' && is_numeric($value)) {
+                    } elseif ($type === 'number' && is_numeric($value)) {
                         $isValidType = true;
                         break;
-                    } elseif (($type == 'integer' || $type == 'int') && is_int($value)) {
+                    } elseif (($type === 'integer' || $type == 'int') && is_int($value)) {
                         $isValidType = true;
                         break;
-                    } elseif (($type == 'boolean' || $type == 'bool') && is_bool($value)) {
+                    } elseif (($type === 'boolean' || $type == 'bool') && is_bool($value)) {
                         $isValidType = true;
                         break;
-                    } elseif ($type == 'null' && $value === null) {
+                    } elseif ($type === 'null' && $value === null) {
                         $isValidType = true;
                         break;
                     }
                 }
                 if (!$isValidType) {
-                    throw new PropertyValueNotValidException("Type error: Property [$property] accepts only [" . implode(',', $integrityConstraints) . "], but given value is: [$actualValueType]");
+                    throw new PropertyValueNotValidException(
+                        sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is [%s]",
+                            get_class($this),
+                            $property,
+                            implode(',', $integrityConstraints),
+                            $actualValueType
+                        ));
                 }
             }
         }
@@ -285,12 +305,11 @@ trait DataContainerTrait
      * @param string $property
      * @param $value
      * @throws PropertyNotValidException
-     * @throws PropertyValueNotValidException
      */
     public function addPropertyValue(string $property, $value): void
     {
         if (!$this->isValidProperty($property)) {
-            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, __CLASS__));
+            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
         }
 
         $integrityConstraints = $this->getIntegritySpecification($property);
@@ -330,13 +349,13 @@ trait DataContainerTrait
                     method_exists($this->properties[$property], 'toArray')) {
                     $properties = $this->properties[$property];
                 } else {
-                    throw new PropertyValueNotValidException(
-                        "Property type error: property [$property]
-                            does not implement DataContainerInterface OR does not have a toArray method OR is not an array"
+                    throw new PropertyValueNotValidException(sprintf(
+                            "Property type error: property [%s] does not implement DataContainerInterface OR does not have a toArray method OR is not an array",
+                            $property)
                     );
                 }
             } else {
-                throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, __CLASS__));
+                throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
             }
         }
 
@@ -350,9 +369,10 @@ trait DataContainerTrait
                     if ($item instanceof DataContainerInterface || method_exists($item, 'toArray')) {
                         return $item->toArray();
                     } else {
-                        throw new PropertyValueNotValidException(
-                            "Value type error: class [" . get_class($item) . "]
-                            does not implement DataContainerInterface nor have a toArray method"
+                        throw new PropertyValueNotValidException(sprintf(
+                                "Value type error: class [%s] does not implement DataContainerInterface OR does not have a toArray method",
+                                get_class($item))
+
                         );
                     }
                 } elseif (is_array($item)) {
@@ -384,12 +404,12 @@ trait DataContainerTrait
         $extraProperties = array_keys(array_diff_key($data, $this->validProperties));
 
         if (!$skipExtraProperties && count($extraProperties)) {
-            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, implode(',', $extraProperties), __CLASS__));
+            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, implode(',', $extraProperties), get_class($this)));
         }
 
         foreach ($this->validProperties as $property => $integritySpecification) {
             if (!array_key_exists($property, $data) && !$skipMissingProperties) {
-                throw new PropertyMissingException("Property [$property] is missing from input array when using " . __CLASS__ . "::fromArray");
+                throw new PropertyMissingException(sprintf("Property [%s] is missing from input array when using %s->fromArray", $property, get_class($this)));
             } elseif (array_key_exists($property, $data)) {
                 $this->$property = $data[$property];
             }
@@ -417,7 +437,7 @@ trait DataContainerTrait
             if ($this->isValidProperty($property)) {
                 return $this->normalizeValue($this->$property);
             } else {
-                throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, __CLASS__));
+                throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
             }
         }
 
@@ -444,9 +464,9 @@ trait DataContainerTrait
             } elseif ($value instanceof DataContainerInterface || method_exists($value, 'normalizeData')) {
                 $normalizedValue = $value->normalizeData();
             } else {
-                throw new PropertyValueNormalizationException(
-                    "Value error: object of type [" . get_class($value) . "]
-                    does not implement DataContainerInterface nor have a [normalizeData] method"
+                throw new PropertyValueNormalizationException(sprintf(
+                        "Value error: object of class [%s] does not implement DataContainerInterface OR does not have a [normalizeData] method",
+                        get_class($value))
                 );
             }
         } elseif (is_array($value)) {

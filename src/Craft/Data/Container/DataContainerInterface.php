@@ -3,9 +3,11 @@
 namespace Craft\Data\Container;
 
 /**
- * Interface DataContainerInterface
- * @package Craft\Data\Container
+ * Interface for a DataContainer concept
+ * A DataContainer is a fine tuned data structure which holds and exposes data.
+ * The container is a passive Object, its not an classical Object (as it SHOULD NOT and DOES NOT provide behaviour).
  *
+ * @package Craft\Data\Container
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  */
 interface DataContainerInterface
