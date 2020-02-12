@@ -5,6 +5,7 @@ namespace Craft\Http\Controller;
 use Craft\Data\Validation\ArrayValidatorInterface;
 use Craft\Data\Validation\RequestValidatorInterface;
 use Craft\Http\Controller\Exception\ActionArgumentException;
+use Craft\Messaging\RequestInterface;
 use Craft\Messaging\Service\ServiceStatusCodes;
 
 
@@ -29,13 +30,13 @@ class ActionArgumentBuilder implements ActionArgumentBuilderInterface
     /**
      * @param array $inputData
      * @param string $inputClass
-     * @return ActionArgumentRequestInterface
+     * @return RequestInterface
      * @throws ActionArgumentException
      * @throws \Throwable
      */
-    public function build(array $inputData, string $inputClass): ActionArgumentRequestInterface
+    public function build(array $inputData, string $inputClass): RequestInterface
     {
-        /** @var ActionArgumentRequestInterface $argument */
+        /** @var RequestInterface $argument */
         $argument = (new \ReflectionClass($inputClass))->newInstance();
 
         $errors = $this->validator->validate($inputData, $argument->getValidatorConstraints());
@@ -56,10 +57,10 @@ class ActionArgumentBuilder implements ActionArgumentBuilderInterface
     }
 
     /**
-     * @param ActionArgumentRequestInterface $object
+     * @param RequestInterface $object
      * @param array $inputData
      */
-    protected function populate(ActionArgumentRequestInterface $object, array $inputData)
+    protected function populate(RequestInterface $object, array $inputData)
     {
         $props = $object->getProperties();
 

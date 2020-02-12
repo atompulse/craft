@@ -2,6 +2,8 @@
 
 namespace Craft\Http\Controller;
 
+use Craft\Messaging\RequestInterface;
+
 /**
  * Interface ActionArgumentBuilderInterface
  * @package Craft\Http\Controller
@@ -10,7 +12,11 @@ namespace Craft\Http\Controller;
  */
 interface ActionArgumentBuilderInterface
 {
-
-    public function build(array $inputData, string $inputClass): ActionArgumentRequestInterface;
+    /**
+     * @param array $inputData
+     * @param string $inputClass
+     * @return RequestInterface
+     */
+    public function build(array $inputData, string $inputClass): RequestInterface;
 
 }

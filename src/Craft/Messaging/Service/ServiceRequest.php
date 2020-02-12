@@ -4,7 +4,7 @@ namespace Craft\Messaging\Service;
 
 use Craft\Data\Container\DataContainerTrait;
 use Craft\Data\Validation\DataValidatorTrait;
-use Craft\Http\Controller\ActionArgumentRequestInterface;
+use Craft\Messaging\RequestInterface;
 
 /**
  * Class ServiceRequest
@@ -12,7 +12,7 @@ use Craft\Http\Controller\ActionArgumentRequestInterface;
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  */
-class ServiceRequest implements ActionArgumentRequestInterface
+class ServiceRequest implements RequestInterface
 {
     use DataContainerTrait;
     use DataValidatorTrait;
