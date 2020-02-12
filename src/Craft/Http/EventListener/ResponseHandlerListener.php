@@ -12,9 +12,9 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
 
 /**
  * Class ResponseHandlerListener
- * @package Craft\Http\EventListener
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class ResponseHandlerListener
 {

@@ -6,7 +6,6 @@ use Craft\Data\Container\DataContainerTrait;
 
 /**
  * Class UserData
- * @package Craft\Security\User
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *

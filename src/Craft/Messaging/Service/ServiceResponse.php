@@ -7,7 +7,6 @@ use Craft\Messaging\ResponseInterface;
 
 /**
  * Class ServiceResponse
- * @package Craft\Messaging\Service
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *

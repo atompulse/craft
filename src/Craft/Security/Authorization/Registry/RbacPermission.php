@@ -7,7 +7,6 @@ use Craft\Data\Container\DataContainerTrait;
 
 /**
  * Class RbacPermission
- * @package Craft\Security\Authorization\Registry
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *

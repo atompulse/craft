@@ -7,9 +7,9 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Class ArrayValidator
- * @package Craft\Data\Validation
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class ArrayValidator implements ArrayValidatorInterface
 {

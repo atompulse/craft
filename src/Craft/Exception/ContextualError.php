@@ -6,7 +6,6 @@ use Craft\Data\Container\DataContainerTrait;
 
 /**
  * Class ContextualError
- * @package Craft\Exception
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *

@@ -6,9 +6,9 @@ use Craft\Data\Container\DataContainerInterface;
 
 /**
  * Interface ContextualErrorInterface
- * @package Craft\Exception
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface ContextualErrorInterface extends DataContainerInterface
 {

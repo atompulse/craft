@@ -4,9 +4,9 @@ namespace Craft\Messaging\Service;
 
 /**
  * Class ServiceStatusCodes
- * @package Craft\Messaging\Service
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class ServiceStatusCodes
 {

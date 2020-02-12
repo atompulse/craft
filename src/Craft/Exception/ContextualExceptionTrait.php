@@ -4,9 +4,9 @@ namespace Craft\Exception;
 
 /**
  * Trait ContextualExceptionTrait
- * @package Craft\Exception
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 trait ContextualExceptionTrait
 {

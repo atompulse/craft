@@ -10,9 +10,9 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class RbacAuthorizationReader
- * @package Craft\Security\Authorization\Registry\File\Reader
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class RbacAuthorizationReader implements RbacAuthorizationReaderInterface
 {

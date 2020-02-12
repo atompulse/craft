@@ -11,9 +11,9 @@ use Craft\Messaging\Service\ServiceStatusCodes;
 
 /**
  * Class ActionArgumentBuilder
- * @package Craft\Http\Controller
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class ActionArgumentBuilder implements ActionArgumentBuilderInterface
 {

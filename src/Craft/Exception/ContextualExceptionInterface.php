@@ -4,9 +4,9 @@ namespace Craft\Exception;
 
 /**
  * Interface ContextualExceptionInterface
- * @package Craft\Exception
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface ContextualExceptionInterface extends \Throwable
 {

@@ -15,9 +15,9 @@ use Throwable;
 
 /**
  * Class ActionArgumentResolver
- * @package Craft\Http\Controller
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class ActionArgumentResolver implements ArgumentValueResolverInterface
 {

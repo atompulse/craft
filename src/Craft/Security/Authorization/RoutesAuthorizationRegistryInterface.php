@@ -4,9 +4,9 @@ namespace Craft\Security\Authorization;
 
 /**
  * Interface RoutesAuthorizationRegistryInterface
- * @package Craft\Security\Authorization
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface RoutesAuthorizationRegistryInterface
 {

@@ -9,9 +9,9 @@ use Symfony\Component\DependencyInjection\Loader;
 
 /**
  * Class ApiExtension
- * @package Atompulse\ApiBundle\DependencyInjection
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class CraftExtension extends Extension
 {

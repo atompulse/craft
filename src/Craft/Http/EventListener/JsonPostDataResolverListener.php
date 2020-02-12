@@ -7,9 +7,9 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 /**
  * Class JsonPostDataResolverListener
- * @package Craft\Http\EventListener
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class JsonPostDataResolverListener
 {

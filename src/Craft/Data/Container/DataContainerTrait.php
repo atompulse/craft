@@ -11,9 +11,9 @@ use DateTimeInterface;
 
 /**
  * Trait DataContainerTrait
- * @package Craft\Data\Container
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 trait DataContainerTrait
 {

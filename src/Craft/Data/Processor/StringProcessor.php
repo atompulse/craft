@@ -4,9 +4,9 @@ namespace Craft\Data\Processor;
 
 /**
  * Class StringProcessor
- * @package Craft\Data\Processor
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class StringProcessor
 {

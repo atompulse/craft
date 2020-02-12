@@ -6,9 +6,9 @@ use Craft\Data\Container\DataContainerInterface;
 
 /**
  * Interface UserDataInterface
- * @package Craft\Security\User
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface UserDataInterface extends DataContainerInterface
 {

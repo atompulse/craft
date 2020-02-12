@@ -9,9 +9,9 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Class Configuration
- * @package CraftBundle\DependencyInjection
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class Configuration implements ConfigurationInterface
 {

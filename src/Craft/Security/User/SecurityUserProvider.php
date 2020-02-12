@@ -13,9 +13,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class UserProvider
- * @package Craft\Security\User
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class SecurityUserProvider implements SecurityUserProviderInterface
 {

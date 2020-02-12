@@ -6,9 +6,9 @@ use Craft\Security\User\SecurityUserInterface;
 
 /**
  * Interface TokenAuthenticatorInterface
- * @package Craft\Security\Authentication
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface TokenAuthenticatorInterface
 {

@@ -6,7 +6,6 @@ use Craft\Exception\ContextualError;
 
 /**
  * Class ServiceError
- * @package Craft\Messaging\Service
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *

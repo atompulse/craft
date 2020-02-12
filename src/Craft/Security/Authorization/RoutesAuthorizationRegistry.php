@@ -9,9 +9,9 @@ use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class RoutesAuthorizationManager
- * @package Craft\Security\Authorization
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class RoutesAuthorizationRegistry implements RoutesAuthorizationRegistryInterface
 {

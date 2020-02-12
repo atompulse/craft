@@ -6,9 +6,9 @@ use Craft\Messaging\RequestInterface;
 
 /**
  * Interface ActionArgumentBuilderInterface
- * @package Craft\Http\Controller
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface ActionArgumentBuilderInterface
 {

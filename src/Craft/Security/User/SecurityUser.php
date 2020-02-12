@@ -4,9 +4,9 @@ namespace Craft\Security\User;
 
 /**
  * Class User
- * @package Craft\Security\User
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class SecurityUser implements SecurityUserInterface
 {

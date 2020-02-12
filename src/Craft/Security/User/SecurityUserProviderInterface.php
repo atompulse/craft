@@ -6,9 +6,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * Interface SecurityUserProviderInterface
- * @package Craft\Security\User
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface SecurityUserProviderInterface extends UserProviderInterface
 {

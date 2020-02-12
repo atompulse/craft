@@ -4,9 +4,9 @@ namespace Craft\Security\User;
 
 /**
  * Interface UserRegistryInterface
- * @package Craft\Security\User
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface UserRegistryInterface
 {

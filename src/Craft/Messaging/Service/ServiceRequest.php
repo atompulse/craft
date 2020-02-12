@@ -8,9 +8,9 @@ use Craft\Messaging\RequestInterface;
 
 /**
  * Class ServiceRequest
- * @package Craft\Messaging\Service
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class ServiceRequest implements RequestInterface
 {

@@ -7,9 +7,9 @@ use ParagonIE\Paseto\JsonToken;
 
 /**
  * Interface TokenManagerInterface
- * @package Craft\Security\Authentication
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface TokenManagerInterface
 {

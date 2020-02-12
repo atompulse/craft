@@ -20,9 +20,9 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Class TokenManager
- * @package Craft\Security\Authentication
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class TokenManager implements TokenManagerInterface
 {

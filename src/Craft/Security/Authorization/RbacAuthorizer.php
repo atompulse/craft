@@ -10,9 +10,9 @@ use Symfony\Component\Security\Core\Security;
 
 /**
  * Class RbacAuthorizer
- * @package Craft\Security\Authorization
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class RbacAuthorizer implements VoterInterface
 {

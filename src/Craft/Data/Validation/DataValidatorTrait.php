@@ -7,9 +7,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Trait DataValidatorTrait
- * @package Craft\Data\Validation
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 trait DataValidatorTrait
 {

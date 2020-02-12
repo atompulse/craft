@@ -6,9 +6,9 @@ use Craft\Messaging\RequestInterface;
 
 /**
  * Class RequestValidator
- * @package Craft\Data\Validation
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class RequestValidator implements RequestValidatorInterface
 {

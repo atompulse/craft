@@ -10,9 +10,9 @@ use Exception;
 
 /**
  * Class FileAuthorizationRegistry
- * @package Craft\Security\Authorization
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class FileAuthorizationRegistry implements AuthorizationRegistryInterface
 {

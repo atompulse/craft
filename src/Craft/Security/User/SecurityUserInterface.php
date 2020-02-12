@@ -6,9 +6,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Interface SecurityUserInterface
- * @package Craft\Security\User
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 interface SecurityUserInterface extends UserInterface
 {

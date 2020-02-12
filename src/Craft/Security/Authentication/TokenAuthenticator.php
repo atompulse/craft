@@ -17,9 +17,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * Class TokenAuthenticator
- * @package Craft\Security\Authenticator
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class TokenAuthenticator extends AbstractGuardAuthenticator implements TokenAuthenticatorInterface
 {

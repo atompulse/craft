@@ -4,9 +4,9 @@ namespace Craft\Security\Authentication;
 
 /**
  * Class TokenKey
- * @package Craft\Security\Authentication
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class TokenKey
 {

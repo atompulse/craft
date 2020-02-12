@@ -15,9 +15,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Class ExceptionHandlerListener
- * @package Craft\Http\EventListener
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class ExceptionHandlerListener
 {

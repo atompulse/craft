@@ -7,9 +7,9 @@ use RuntimeException;
 
 /**
  * Class HttpStatusCodes
- * @package Craft\Messaging\Http
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
+ *
  */
 class HttpStatusCodes
 {
