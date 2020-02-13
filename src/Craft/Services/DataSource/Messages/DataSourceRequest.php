@@ -21,8 +21,6 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
 
     public function __construct(array $data = null)
     {
-        parent::__construct();
-
         $this->defineProperty('page', ['number']);
         $this->defineProperty('pageSize', ['number']);
         $this->defineProperty('sorters', ['array', 'null']);

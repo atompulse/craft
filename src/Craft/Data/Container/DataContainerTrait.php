@@ -116,137 +116,6 @@ trait DataContainerTrait
     }
 
     /**
-     * Check if a property is valid
-     * @param string $property
-     * @return bool
-     */
-    public function isValidProperty(string $property): bool
-    {
-        if (!empty($this->validProperties) && !array_key_exists($property, $this->validProperties)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Get defined integrity check type|value for a property
-     * @param string $property
-     * @return array
-     */
-    private function getIntegritySpecification(string $property)
-    {
-        $allConstraints = $this->validProperties[$property];
-
-        if (!is_array($allConstraints)) {
-            $constraints = $this->parseIntegritySpecification($allConstraints);
-        } else {
-            $constraints = [];
-            // extract only the `type` related constraints
-            foreach ($allConstraints as $key => $value) {
-                if (is_numeric($key)) {
-                    $constraints[] = $value;
-                }
-            }
-        }
-
-        return $constraints;
-    }
-
-    /**
-     * Parse integrity specification "array|null"
-     * @param string $integritySpecification
-     * @return array
-     */
-    private function parseIntegritySpecification(string $integritySpecification)
-    {
-        $parsedIntegritySpecification = [];
-
-        if (strpos($integritySpecification, '|') !== false) {
-            $parsedIntegritySpecification = explode('|', $integritySpecification);
-        } elseif (!empty($integritySpecification)) {
-            $parsedIntegritySpecification = [$integritySpecification];
-        }
-
-        return $parsedIntegritySpecification;
-    }
-
-    /**
-     * Check property value type
-     * @param string $property
-     * @param mixed $value
-     * @return bool
-     * @throws PropertyValueNotValidException
-     */
-    private function checkTypes(string $property, $value)
-    {
-        $integrityConstraints = $this->getIntegritySpecification($property);
-
-        $actualValueType = gettype($value);
-
-        if ($actualValueType === 'double') {
-            $actualValueType = is_int($value) ? 'integer' : 'number';
-        } else {
-            if ($actualValueType === 'NULL') {
-                $actualValueType = 'null';
-            }
-        }
-
-        if (count($integrityConstraints)) {
-            // object check
-            if ($actualValueType === 'object') {
-                if (!in_array(get_class($value), $integrityConstraints)) {
-                    throw new PropertyValueNotValidException(
-                        sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is instance of [%s]",
-                            get_class($this),
-                            $property,
-                            implode(',', $integrityConstraints),
-                            $value
-                        ));
-                }
-            } else {
-                // primitive type value
-                $isValidType = false;
-                foreach ($integrityConstraints as $type) {
-                    if ($type === 'object' && is_object($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif ($type === 'array' && is_array($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif ($type === 'string' && is_string($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif ($type === 'number' && is_numeric($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif (($type === 'integer' || $type == 'int') && is_int($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif (($type === 'boolean' || $type == 'bool') && is_bool($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif ($type === 'null' && $value === null) {
-                        $isValidType = true;
-                        break;
-                    }
-                }
-                if (!$isValidType) {
-                    throw new PropertyValueNotValidException(
-                        sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is [%s]",
-                            get_class($this),
-                            $property,
-                            implode(',', $integrityConstraints),
-                            $actualValueType
-                        ));
-                }
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * @inheritdoc
      * @param $name
      * @return bool
@@ -449,6 +318,149 @@ trait DataContainerTrait
     }
 
     /**
+     * Check if a property is valid
+     * @param string $property
+     * @return bool
+     */
+    public function isValidProperty(string $property): bool
+    {
+        if (!empty($this->validProperties) && !array_key_exists($property, $this->validProperties)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Set custom $errorMessage for PropertyNotValidException
+     * @param string $errorMessage
+     * @see There are 2 string parameters that will be replaced in the message using sprintf
+     * first is the invalid $property and the second is the current class name
+     * @template 'Property ["%s"] not valid for this class ["%s"]'
+     */
+    public function setPropertyNotValidErrorMessage(string $errorMessage)
+    {
+        $this->propertyNotValidErrorMessage = $errorMessage;
+    }
+
+    /**
+     * Get defined integrity check type|value for a property
+     * @param string $property
+     * @return array
+     */
+    private function getIntegritySpecification(string $property)
+    {
+        $allConstraints = $this->validProperties[$property];
+
+        if (!is_array($allConstraints)) {
+            $constraints = $this->parseIntegritySpecification($allConstraints);
+        } else {
+            $constraints = [];
+            // extract only the `type` related constraints
+            foreach ($allConstraints as $key => $value) {
+                if (is_numeric($key)) {
+                    $constraints[] = $value;
+                }
+            }
+        }
+
+        return $constraints;
+    }
+
+    /**
+     * Parse integrity specification "array|null"
+     * @param string $integritySpecification
+     * @return array
+     */
+    private function parseIntegritySpecification(string $integritySpecification)
+    {
+        $parsedIntegritySpecification = [];
+
+        if (strpos($integritySpecification, '|') !== false) {
+            $parsedIntegritySpecification = explode('|', $integritySpecification);
+        } elseif (!empty($integritySpecification)) {
+            $parsedIntegritySpecification = [$integritySpecification];
+        }
+
+        return $parsedIntegritySpecification;
+    }
+
+    /**
+     * Check property value type
+     * @param string $property
+     * @param mixed $value
+     * @return bool
+     * @throws PropertyValueNotValidException
+     */
+    private function checkTypes(string $property, $value)
+    {
+        $integrityConstraints = $this->getIntegritySpecification($property);
+
+        $actualValueType = gettype($value);
+
+        if ($actualValueType === 'double') {
+            $actualValueType = is_int($value) ? 'integer' : 'number';
+        } else {
+            if ($actualValueType === 'NULL') {
+                $actualValueType = 'null';
+            }
+        }
+
+        if (count($integrityConstraints)) {
+            // object check
+            if ($actualValueType === 'object') {
+                if (!in_array(get_class($value), $integrityConstraints)) {
+                    throw new PropertyValueNotValidException(
+                        sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is instance of [%s]",
+                            get_class($this),
+                            $property,
+                            implode(',', $integrityConstraints),
+                            $value
+                        ));
+                }
+            } else {
+                // primitive type value
+                $isValidType = false;
+                foreach ($integrityConstraints as $type) {
+                    if ($type === 'object' && is_object($value)) {
+                        $isValidType = true;
+                        break;
+                    } elseif ($type === 'array' && is_array($value)) {
+                        $isValidType = true;
+                        break;
+                    } elseif ($type === 'string' && is_string($value)) {
+                        $isValidType = true;
+                        break;
+                    } elseif ($type === 'number' && is_numeric($value)) {
+                        $isValidType = true;
+                        break;
+                    } elseif (($type === 'integer' || $type == 'int') && is_int($value)) {
+                        $isValidType = true;
+                        break;
+                    } elseif (($type === 'boolean' || $type == 'bool') && is_bool($value)) {
+                        $isValidType = true;
+                        break;
+                    } elseif ($type === 'null' && $value === null) {
+                        $isValidType = true;
+                        break;
+                    }
+                }
+                if (!$isValidType) {
+                    throw new PropertyValueNotValidException(
+                        sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is [%s]",
+                            get_class($this),
+                            $property,
+                            implode(',', $integrityConstraints),
+                            $actualValueType
+                        ));
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Normalize a property value
      * @param $value
      * @return mixed
@@ -476,18 +488,6 @@ trait DataContainerTrait
         }
 
         return $normalizedValue;
-    }
-
-    /**
-     * Set custom $errorMessage for PropertyNotValidException
-     * @param string $errorMessage
-     * @see There are 2 string parameters that will be replaced in the message using sprintf
-     * first is the invalid $property and the second is the current class name
-     * @template 'Property ["%s"] not valid for this class ["%s"]'
-     */
-    public function setPropertyNotValidErrorMessage(string $errorMessage)
-    {
-        $this->propertyNotValidErrorMessage = $errorMessage;
     }
 
 }
