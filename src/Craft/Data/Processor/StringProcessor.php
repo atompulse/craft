@@ -5,12 +5,13 @@ namespace Craft\Data\Processor;
 /**
  * Class StringProcessor
  *
+ * A utility class to handle most common string transformations in apps
+ *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *
  */
 class StringProcessor
 {
-
     /**
      * Transform a string from camelCase to under_score
      * @param string $string
@@ -30,8 +31,8 @@ class StringProcessor
     {
         /**
          * Transliterated sets
-         * $a = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', 'Ā', 'ā', 'Ă', 'ă', 'Ą', 'ą', 'Ć', 'ć', 'Ĉ', 'ĉ', 'Ċ', 'ċ', 'Č', 'č', 'Ď', 'ď', 'Đ', 'đ', 'Ē', 'ē', 'Ĕ', 'ĕ', 'Ė', 'ė', 'Ę', 'ę', 'Ě', 'ě', 'Ĝ', 'ĝ', 'Ğ', 'ğ', 'Ġ', 'ġ', 'Ģ', 'ģ', 'Ĥ', 'ĥ', 'Ħ', 'ħ', 'Ĩ', 'ĩ', 'Ī', 'ī', 'Ĭ', 'ĭ', 'Į', 'į', 'İ', 'ı', 'Ĳ', 'ĳ', 'Ĵ', 'ĵ', 'Ķ', 'ķ', 'Ĺ', 'ĺ', 'Ļ', 'ļ', 'Ľ', 'ľ', 'Ŀ', 'ŀ', 'Ł', 'ł', 'Ń', 'ń', 'Ņ', 'ņ', 'Ň', 'ň', 'ŉ', 'Ō', 'ō', 'Ŏ', 'ŏ', 'Ő', 'ő', 'Œ', 'œ', 'Ŕ', 'ŕ', 'Ŗ', 'ŗ', 'Ř', 'ř', 'Ś', 'ś', 'Ŝ', 'ŝ', 'Ş', 'ş', 'Š', 'š', 'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ', 'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ', 'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ');
-         * $b = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o');
+         * $from = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'ÿ', 'Ā', 'ā', 'Ă', 'ă', 'Ą', 'ą', 'Ć', 'ć', 'Ĉ', 'ĉ', 'Ċ', 'ċ', 'Č', 'č', 'Ď', 'ď', 'Đ', 'đ', 'Ē', 'ē', 'Ĕ', 'ĕ', 'Ė', 'ė', 'Ę', 'ę', 'Ě', 'ě', 'Ĝ', 'ĝ', 'Ğ', 'ğ', 'Ġ', 'ġ', 'Ģ', 'ģ', 'Ĥ', 'ĥ', 'Ħ', 'ħ', 'Ĩ', 'ĩ', 'Ī', 'ī', 'Ĭ', 'ĭ', 'Į', 'į', 'İ', 'ı', 'Ĳ', 'ĳ', 'Ĵ', 'ĵ', 'Ķ', 'ķ', 'Ĺ', 'ĺ', 'Ļ', 'ļ', 'Ľ', 'ľ', 'Ŀ', 'ŀ', 'Ł', 'ł', 'Ń', 'ń', 'Ņ', 'ņ', 'Ň', 'ň', 'ŉ', 'Ō', 'ō', 'Ŏ', 'ŏ', 'Ő', 'ő', 'Œ', 'œ', 'Ŕ', 'ŕ', 'Ŗ', 'ŗ', 'Ř', 'ř', 'Ś', 'ś', 'Ŝ', 'ŝ', 'Ş', 'ş', 'Š', 'š', 'Ţ', 'ţ', 'Ť', 'ť', 'Ŧ', 'ŧ', 'Ũ', 'ũ', 'Ū', 'ū', 'Ŭ', 'ŭ', 'Ů', 'ů', 'Ű', 'ű', 'Ų', 'ų', 'Ŵ', 'ŵ', 'Ŷ', 'ŷ', 'Ÿ', 'Ź', 'ź', 'Ż', 'ż', 'Ž', 'ž', 'ſ', 'ƒ', 'Ơ', 'ơ', 'Ư', 'ư', 'Ǎ', 'ǎ', 'Ǐ', 'ǐ', 'Ǒ', 'ǒ', 'Ǔ', 'ǔ', 'Ǖ', 'ǖ', 'Ǘ', 'ǘ', 'Ǚ', 'ǚ', 'Ǜ', 'ǜ', 'Ǻ', 'ǻ', 'Ǽ', 'ǽ', 'Ǿ', 'ǿ');
+         * $to = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 's', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'y', 'A', 'a', 'A', 'a', 'A', 'a', 'C', 'c', 'C', 'c', 'C', 'c', 'C', 'c', 'D', 'd', 'D', 'd', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'E', 'e', 'G', 'g', 'G', 'g', 'G', 'g', 'G', 'g', 'H', 'h', 'H', 'h', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'I', 'i', 'IJ', 'ij', 'J', 'j', 'K', 'k', 'L', 'l', 'L', 'l', 'L', 'l', 'L', 'l', 'l', 'l', 'N', 'n', 'N', 'n', 'N', 'n', 'n', 'O', 'o', 'O', 'o', 'O', 'o', 'OE', 'oe', 'R', 'r', 'R', 'r', 'R', 'r', 'S', 's', 'S', 's', 'S', 's', 'S', 's', 'T', 't', 'T', 't', 'T', 't', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'W', 'w', 'Y', 'y', 'Y', 'Z', 'z', 'Z', 'z', 'Z', 'z', 's', 'f', 'O', 'o', 'U', 'u', 'A', 'a', 'I', 'i', 'O', 'o', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'U', 'u', 'A', 'a', 'AE', 'ae', 'O', 'o');
          */
         $rule = 'Any-Latin; Latin-ASCII;';
         $operator = \Transliterator::create($rule);
@@ -43,23 +44,17 @@ class StringProcessor
      * Converts an underscored or CamelCase word into a English
      * sentence.
      *
-     * The titleize public static function converts text like "WelcomePage",
-     * "welcome_page" or  "welcome page" to this "Welcome
-     * Page".
-     * If second parameter is set to 'first' it will only
-     * capitalize the first character of the title.
+     * Converts text like "WelcomePage", "welcome_page" or  "welcome page" to this "Welcome Page".
+     * If second parameter is set to 'first' it will only capitalize the first character of the title.
      *
-     * @access public
-     * @static
      * @param string $word Word to format as tile
      * @param string $uppercase If set to 'first' it will only uppercase the
-     * first character. Otherwise it will uppercase all
-     * the words in the title.
+     * first character. Otherwise it will uppercase all the words in the title.
      * @return string Text formatted as title
      */
     public static function titleize(string $word, string $uppercase = ''): string
     {
-        $uppercase = $uppercase == 'first' ? 'ucfirst' : 'ucwords';
+        $uppercase = $uppercase === 'first' ? 'ucfirst' : 'ucwords';
 
         return $uppercase(self::humanize(self::underscore($word)));
     }
@@ -74,8 +69,6 @@ class StringProcessor
      * If you need to uppercase all the words you just have to
      * pass 'all' as a second parameter.
      *
-     * @access public
-     * @static
      * @param string $word String to "humanize"
      * @param string $uppercase If set to 'all' it will uppercase all the words
      * instead of just the first one.
@@ -83,7 +76,7 @@ class StringProcessor
      */
     public static function humanize(string $word, string $uppercase = ''): string
     {
-        $uppercase = $uppercase == 'all' ? 'ucwords' : 'ucfirst';
+        $uppercase = $uppercase === 'all' ? 'ucwords' : 'ucfirst';
 
         return $uppercase(mb_strtolower(str_replace('_', ' ', preg_replace('/_id$/', '', $word))));
     }
@@ -94,10 +87,6 @@ class StringProcessor
      * Convert any "CamelCased" or "ordinary Word" into an
      * "underscored_word".
      *
-     * This can be really useful for creating friendly URLs.
-     *
-     * @access public
-     * @static
      * @param string $word Word to underscore
      * @return string Underscored word
      */
@@ -119,12 +108,10 @@ class StringProcessor
     /**
      * Same as camelize but first char is underscored
      *
-     * Converts a word like "send_email" to "sendEmail". It
-     * will remove non alphanumeric character from the word, so
-     * "who's online" will be converted to "whoSOnline"
+     * Converts a word like "send_email" to "sendEmail".
+     * It will remove non alphanumeric character from the word,
+     * i.e. "who's online" will be converted to "whoSOnline"
      *
-     * @access public
-     * @static
      * @param string $word Word to lowerCamelCase
      * @return string Returns a lowerCamelCasedWord
      * @see camelize
@@ -139,12 +126,10 @@ class StringProcessor
     /**
      * Returns given word as CamelCased
      *
-     * Converts a word like "send_email" to "SendEmail". It
-     * will remove non alphanumeric character from the word, so
-     * "who's online" will be converted to "WhoSOnline"
+     * Converts a word like "send_email" to "SendEmail".
+     * It will remove non alphanumeric character from the word,
+     * so "who's online" will be converted to "WhoSOnline"
      *
-     * @access public
-     * @static
      * @param string $word Word to convert to camel case
      * @return string UpperCamelCasedWord
      * @see variablize
@@ -160,8 +145,6 @@ class StringProcessor
      *
      * Converts "Person" to "people"
      *
-     * @access public
-     * @static
      * @param string $className Class name for getting related table_name.
      * @return string plural_table_name
      * @see classify
@@ -174,14 +157,12 @@ class StringProcessor
     /**
      * Pluralizes English nouns.
      *
-     * @access public
-     * @static
      * @param string $word English noun to pluralize
      * @return string Plural noun
      */
     public static function pluralize(string $word): string
     {
-        $plural = [
+        $pluralRules = [
             '/(quiz)$/i' => '\1zes',
             '/^(ox)$/i' => '\1en',
             '/([m|l])ouse$/i' => '\1ice',
@@ -202,9 +183,18 @@ class StringProcessor
             '/$/' => 's'
         ];
 
-        $uncountable = ['equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep'];
+        $uncountableList = [
+            'equipment',
+            'information',
+            'rice',
+            'money',
+            'species',
+            'series',
+            'fish',
+            'sheep'
+        ];
 
-        $irregular = [
+        $irregularList = [
             'person' => 'people',
             'man' => 'men',
             'child' => 'children',
@@ -212,27 +202,27 @@ class StringProcessor
             'move' => 'moves'
         ];
 
-        $lowercased_word = strtolower($word);
+        $lowercaseWord = strtolower($word);
 
-        foreach ($uncountable as $_uncountable) {
-            if (substr($lowercased_word, (-1 * strlen($_uncountable))) == $_uncountable) {
+        foreach ($uncountableList as $uncountable) {
+            if (substr($lowercaseWord, (-1 * strlen($uncountable))) == $uncountable) {
                 return $word;
             }
         }
 
-        foreach ($irregular as $_plural => $_singular) {
-            if (preg_match('/(' . $_plural . ')$/i', $word, $arr)) {
-                return preg_replace('/(' . $_plural . ')$/i', substr($arr[0], 0, 1) . substr($_singular, 1), $word);
+        foreach ($irregularList as $plural => $singular) {
+            if (preg_match('/(' . $plural . ')$/i', $word, $arr)) {
+                return preg_replace('/(' . $plural . ')$/i', substr($arr[0], 0, 1) . substr($singular, 1), $word);
             }
         }
 
-        foreach ($plural as $rule => $replacement) {
+        foreach ($pluralRules as $rule => $replacement) {
             if (preg_match($rule, $word)) {
                 return preg_replace($rule, $replacement, $word);
             }
         }
 
-        return false;
+        return $word;
     }
 
     /**
@@ -241,8 +231,6 @@ class StringProcessor
      *
      * Converts "people" to "Person"
      *
-     * @access public
-     * @static
      * @param string $tableName Table name for getting related ClassName.
      * @return string SingularClassName
      * @see tableize
@@ -255,14 +243,12 @@ class StringProcessor
     /**
      * Singularizes English nouns.
      *
-     * @access public
-     * @static
      * @param string $word English noun to singularize
      * @return string Singular noun.
      */
     public static function singularize(string $word): string
     {
-        $singular = [
+        $singularRules = [
             '/(quiz)zes$/i' => '\1',
             '/(matr)ices$/i' => '\1ix',
             '/(vert|ind)ices$/i' => '\1ex',
@@ -289,9 +275,18 @@ class StringProcessor
             '/s$/i' => '',
         ];
 
-        $uncountable = ['equipment', 'information', 'rice', 'money', 'species', 'series', 'fish', 'sheep'];
+        $uncountableList = [
+            'equipment',
+            'information',
+            'rice',
+            'money',
+            'species',
+            'series',
+            'fish',
+            'sheep'
+        ];
 
-        $irregular = [
+        $irregularList = [
             'person' => 'people',
             'man' => 'men',
             'child' => 'children',
@@ -299,20 +294,21 @@ class StringProcessor
             'move' => 'moves'
         ];
 
-        $lowercased_word = strtolower($word);
-        foreach ($uncountable as $_uncountable) {
-            if (substr($lowercased_word, (-1 * strlen($_uncountable))) == $_uncountable) {
+        $lowercaseWord = strtolower($word);
+
+        foreach ($uncountableList as $uncountable) {
+            if (substr($lowercaseWord, (-1 * strlen($uncountable))) === $uncountable) {
                 return $word;
             }
         }
 
-        foreach ($irregular as $_plural => $_singular) {
-            if (preg_match('/(' . $_singular . ')$/i', $word, $arr)) {
-                return preg_replace('/(' . $_singular . ')$/i', substr($arr[0], 0, 1) . substr($_plural, 1), $word);
+        foreach ($irregularList as $plural => $singular) {
+            if (preg_match('/(' . $singular . ')$/i', $word, $arr)) {
+                return preg_replace('/(' . $singular . ')$/i', substr($arr[0], 0, 1) . substr($plural, 1), $word);
             }
         }
 
-        foreach ($singular as $rule => $replacement) {
+        foreach ($singularRules as $rule => $replacement) {
             if (preg_match($rule, $word)) {
                 return preg_replace($rule, $replacement, $word);
             }
@@ -326,8 +322,6 @@ class StringProcessor
      *
      * This method converts 13 to 13th, 2 to 2nd ...
      *
-     * @access public
-     * @static
      * @param integer $number Number to get its ordinal value
      * @return string Ordinal representation of given string.
      */
@@ -353,27 +347,31 @@ class StringProcessor
     }
 
     /**
-     * @param $string
-     * @param $start
-     * @param $end
+     * Extracts a piece from a string from the enclosures $start"myString"$end
+     *
+     * @param string $string
+     * @param string $start
+     * @param string $end
      * @return string
      */
     public static function strBetween(string $string, string $start, string $end): string
     {
         $string = " " . $string;
-        $ini = strpos($string, $start);
-        if ($ini == 0) {
+        $startFrom = strpos($string, $start);
+
+        if ($startFrom == 0) {
             return "";
         }
-        $ini += strlen($start);
-        $len = strpos($string, $end, $ini) - $ini;
 
-        return substr($string, $ini, $len);
+        $startFrom += strlen($start);
+        $length = strpos($string, $end, $startFrom) - $startFrom;
+
+        return substr($string, $startFrom, $length);
     }
 
     /**
      * Shorten a string ant transform into capitals 'john van helsing' will be JVH
-     * @param $string $string
+     * @param string $string
      * @return string
      */
     public static function shortenAndCapitalize(string $string): string
@@ -390,7 +388,7 @@ class StringProcessor
 
     /**
      * Transform <BR> to PHP_EOL
-     * @param $string
+     * @param string $string
      * @return string
      */
     public static function br2nl(string $string): string
