@@ -21,8 +21,8 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
 
     public function __construct(array $data = null)
     {
-        $this->defineProperty('page', ['number']);
-        $this->defineProperty('pageSize', ['number']);
+        $this->defineProperty('page', ['number'], 1);
+        $this->defineProperty('pageSize', ['number'], 10);
         $this->defineProperty('sorters', ['array', 'null']);
         $this->defineProperty('filters', ['array', 'null']);
 
@@ -36,7 +36,7 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
      */
     public function getPage(): int
     {
-        return $this->page;
+        return $this->getPropertyValue('page');
     }
 
     /**
@@ -44,23 +44,7 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
      */
     public function getPageSize(): int
     {
-        return $this->pageSize;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFilters(): array
-    {
-        return $this->filters;
-    }
-
-    /**
-     * @return array
-     */
-    public function getSorters(): array
-    {
-        return $this->sorters;
+        return $this->getPropertyValue('pageSize');
     }
 
     /**
@@ -70,6 +54,24 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
     public function addFilter(string $key, $value): void
     {
         $this->addPropertyValue('filters', new FilterValue($key, $value));
+    }
+
+    /**
+     * @param array $filters
+     */
+    public function setFilters(array $filters): void
+    {
+        foreach ($filters as $filterKey => $filterValue) {
+            $this->addFilter($filterKey, $filterValue);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilters(): array
+    {
+        return $this->getPropertyValue('filters');
     }
 
     /**
@@ -84,6 +86,24 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
         }
 
         throw new \Exception("Unrecognized sorter direction [$direction]");
+    }
+
+    /**
+     * @param array $sorters
+     */
+    public function setSorters(array $sorters): void
+    {
+        foreach ($sorters as $key => $direction) {
+            $this->addSorter($key, $direction);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getSorters(): array
+    {
+        return $this->getPropertyValue('sorters');
     }
 
 }

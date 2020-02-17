@@ -20,15 +20,47 @@ interface DataSourceRequestInterface extends RequestInterface
     const SORT_ASC = 'asc';
     const SORT_DESC = 'asc';
 
+    /**
+     * @return int
+     */
     public function getPage(): int;
 
+    /**
+     * @return int
+     */
     public function getPageSize(): int;
 
+    /**
+     * @param string $field
+     * @param string $direction
+     */
+    public function addSorter(string $field, string $direction = self::SORT_ASC): void;
+
+    /**
+     * @param array $sorters
+     */
+    public function setSorters(array $sorters): void;
+
+    /**
+     * @return array
+     */
     public function getSorters(): array;
 
-    public function getFilters(): array;
-
+    /**
+     * @param string $field
+     * @param $value
+     */
     public function addFilter(string $field, $value): void;
 
-    public function addSorter(string $field, string $direction = self::SORT_ASC): void;
+    /**
+     * @param array $filters
+     */
+    public function setFilters(array $filters): void;
+
+    /**
+     * @return array
+     */
+    public function getFilters(): array;
+
+
 }

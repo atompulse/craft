@@ -19,15 +19,33 @@ use Craft\Messaging\ResponseInterface;
  */
 interface DataSourceResponseInterface extends ResponseInterface
 {
+    /**
+     * @return array
+     */
     public function getData(): array;
 
+    /**
+     * @return int
+     */
     public function getPage(): int;
 
+    /**
+     * @return int
+     */
     public function getPages(): int;
 
+    /**
+     * @return int
+     */
     public function getPageSize(): int;
 
+    /**
+     * @return array
+     */
     public function getSorters(): array;
 
+    /**
+     * @return array
+     */
     public function getFilters(): array;
 }

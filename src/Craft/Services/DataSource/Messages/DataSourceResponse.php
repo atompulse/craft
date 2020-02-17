@@ -10,7 +10,9 @@ use Craft\Messaging\Service\ServiceResponse;
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *
+ * @property array data
  * @property number page
+ * @property number pages
  * @property number pageSize
  * @property array sorters
  * @property array filters
@@ -41,7 +43,7 @@ class DataSourceResponse extends ServiceResponse implements DataSourceResponseIn
      */
     public function getData(): array
     {
-        return $this->data;
+        return $this->getPropertyValue('data');
     }
 
     /**
@@ -49,7 +51,7 @@ class DataSourceResponse extends ServiceResponse implements DataSourceResponseIn
      */
     public function getPage(): int
     {
-        return $this->page;
+        return $this->getPropertyValue('page');
     }
 
     /**
@@ -57,7 +59,7 @@ class DataSourceResponse extends ServiceResponse implements DataSourceResponseIn
      */
     public function getPages(): int
     {
-        return $this->pages;
+        return $this->getPropertyValue('pages');
     }
 
     /**
@@ -65,7 +67,7 @@ class DataSourceResponse extends ServiceResponse implements DataSourceResponseIn
      */
     public function getPageSize(): int
     {
-        return $this->pageSize;
+        return $this->getPropertyValue('pageSize');
     }
 
     /**
@@ -73,7 +75,7 @@ class DataSourceResponse extends ServiceResponse implements DataSourceResponseIn
      */
     public function getSorters(): array
     {
-        return $this->sorters;
+        return $this->getPropertyValue('sorters');
     }
 
     /**
@@ -81,6 +83,6 @@ class DataSourceResponse extends ServiceResponse implements DataSourceResponseIn
      */
     public function getFilters(): array
     {
-        return $this->filters;
+        return $this->getPropertyValue('filters');
     }
 }
