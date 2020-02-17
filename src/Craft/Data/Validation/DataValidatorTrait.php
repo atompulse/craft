@@ -13,6 +13,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 trait DataValidatorTrait
 {
+    /**
+     * @return array
+     */
     public function getValidatorConstraints(): array
     {
         if (method_exists($this, 'getProperties')) {
@@ -31,6 +34,10 @@ trait DataValidatorTrait
 
     }
 
+    /**
+     * @param array $constraints
+     * @return array
+     */
     private function translateConstraints(array $constraints)
     {
         $validatorConstraints = [];
@@ -61,6 +68,9 @@ trait DataValidatorTrait
                 case 'bool' :
                     $validatorConstraints[] = new Assert\Type(['type' => 'bool']);
                     break;
+                case 'array' :
+                    $validatorConstraints[] = new Assert\Type(['type' => 'array']);
+                    break;
                 case 'null' :
                     $validatorConstraints[] = new Assert\NotBlank(['allowNull' => true]);
                     $nullable = true;
@@ -69,8 +79,8 @@ trait DataValidatorTrait
 
                     $refinedName = $this->buildConstraintName($constraintName);
 
-                        // try to determine if its a symfony validator before giving up
-                        $constraintClass = '\Symfony\Component\Validator\Constraints\\' . $this->buildConstraintName($constraintName);
+                    // try to determine if its a symfony validator before giving up
+                    $constraintClass = '\Symfony\Component\Validator\Constraints\\' . $this->buildConstraintName($constraintName);
 
                         $factory = new \ReflectionClass($constraintClass);
                         if ($hasArguments) {
