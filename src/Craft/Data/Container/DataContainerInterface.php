@@ -28,6 +28,13 @@ interface DataContainerInterface
     public function addPropertyValue(string $property, $value): void;
 
     /**
+     * Get a property value
+     * @param string $property
+     * @return mixed
+     */
+    public function getPropertyValue(string $property);
+
+    /**
      * Check if a property is valid
      * @param string $property
      * @return bool

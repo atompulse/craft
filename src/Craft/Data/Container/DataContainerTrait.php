@@ -46,7 +46,7 @@ trait DataContainerTrait
     private $propertyNotValidErrorMessage = 'Property ["%s"] not valid for this class ["%s"]';
 
     /**
-     * @inheritdoc
+     * Support for public property getting
      * @param string $property
      * @return mixed
      * @throws PropertyNotValidException
@@ -77,7 +77,7 @@ trait DataContainerTrait
     }
 
     /**
-     * @inheritdoc
+     * Support for public property setting
      * @param string $property
      * @param mixed $value Value of property
      * @return void
@@ -191,6 +191,30 @@ trait DataContainerTrait
 
         // perform property value type checking
         $this->checkTypes($property, $this->properties[$property]);
+    }
+
+    /**
+     * Get a property value
+     * @param string $property
+     * @return mixed
+     * @throws PropertyNotValidException
+     */
+    public function getPropertyValue(string $property)
+    {
+        if (!$this->isValidProperty($property)) {
+            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
+        }
+
+        $propertyValue = null;
+
+        // default value when property was not set
+        if (!array_key_exists($property, $this->properties) && array_key_exists($property, $this->defaultValues)) {
+            $propertyValue = &$this->defaultValues[$property];
+        } elseif (array_key_exists($property, $this->properties)) {
+            $propertyValue = &$this->properties[$property];
+        }
+
+        return $propertyValue;
     }
 
     /**
