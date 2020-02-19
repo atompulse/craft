@@ -218,74 +218,27 @@ trait DataContainerTrait
     }
 
     /**
-     * Transform data properties into PHP-array structure keeping
-     * property items in their respective DataContainerInterface state if the values are objects
+     * Get the DataContainer's current state as an array
      *
-     * This method will ONLY return the current state of the data with object and primitives,
-     * it will not return default values or property values that have not been set.
+     * This method WILL NOT return default values or property values that have not been explicitly added.
      *
-     * @param string|null $property
      * @return array [key => value] Data structure
-     * @throws PropertyNotValidException
-     * @throws PropertyValueNotValidException
-     * @see To get a normalized result set use ::normalizeData method
      *
+     * @see To get a normalized result set use ::normalizeData method
      */
-    public function toArray(string $property = null): array
+    public function toArray(): array
     {
-        $properties = $this->properties;
+        $data = [];
 
-        if (!is_null($property)) {
-            if ($this->isValidProperty($property)) {
-                if (is_array($this->properties[$property]) ||
-                    $this->properties[$property] instanceof DataContainerInterface ||
-                    method_exists($this->properties[$property], 'toArray')) {
-                    $properties = $this->properties[$property];
-                } else {
-                    throw new PropertyValueNotValidException(sprintf(
-                            "Property type error: property [%s] does not implement DataContainerInterface OR does not have a toArray method OR is not an array",
-                            $property)
-                    );
-                }
-            } else {
-                throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
-            }
+        foreach ($this->properties as $property => $value) {
+            $data[$property] = $this->normalizeValue($value, 'toArray');
         }
 
-        return array_map(
-            function ($item) {
-                if (is_object($item)) {
-                    // default object->primitive type conversion for DateTime objects
-                    if ($item instanceof DateTimeInterface) {
-                        return $item->format("Y-m-d\TH:i:s.u\Z");
-                    }
-                    if ($item instanceof DataContainerInterface || method_exists($item, 'toArray')) {
-                        return $item->toArray();
-                    } else {
-                        throw new PropertyValueNotValidException(sprintf(
-                                "Value type error: class [%s] does not implement DataContainerInterface OR does not have a toArray method",
-                                get_class($item))
-
-                        );
-                    }
-                } elseif (is_array($item)) {
-                    return array_map(
-                        function ($subItem) {
-                            if ($subItem instanceof DataContainerInterface || method_exists($subItem, 'toArray')) {
-                                return $subItem->toArray();
-                            }
-                            return $subItem;
-                        },
-                        $item
-                    );
-                }
-                return $item;
-            },
-            $properties
-        );
+        return $data;
     }
 
     /**
+     * Populate DataContainer from array and perform integrity checks
      * @param array $data
      * @param bool $skipExtraProperties Ignore extra properties that do not belong to the class
      * @param bool $skipMissingProperties Ignore missing properties in input $data
@@ -300,11 +253,14 @@ trait DataContainerTrait
             throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, implode(',', $extraProperties), get_class($this)));
         }
 
-        foreach ($this->validProperties as $property => $integritySpecification) {
-            if (!array_key_exists($property, $data) && !$skipMissingProperties) {
+        foreach ($this->getPropertiesList() as $property) {
+
+            $propertyIsPresent = array_key_exists($property, $data);
+
+            if (!$propertyIsPresent && !$skipMissingProperties) {
                 throw new PropertyMissingException(sprintf("Property [%s] is missing from input array when using %s->fromArray", $property, get_class($this)));
-            } elseif (array_key_exists($property, $data)) {
-                $this->$property = $data[$property];
+            } elseif ($propertyIsPresent) {
+                $this->addPropertyValue($property, $data[$property]);
             }
         }
 
@@ -316,26 +272,14 @@ trait DataContainerTrait
      * - handles DataContainerInterface property values normalization
      * - return simple array with key->value OR multidimensional array with key->array but never object values
      *
-     * @param string|null $property Normalize a specific property of the container
      * @return array
-     * @throws PropertyNotValidException
      */
-    public function normalizeData(string $property = null): array
+    public function normalizeData(): array
     {
         $data = [];
 
-        $validProperties = $this->validProperties;
-
-        if (!is_null($property)) {
-            if ($this->isValidProperty($property)) {
-                return $this->normalizeValue($this->$property);
-            } else {
-                throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
-            }
-        }
-
-        foreach ($validProperties as $validProperty => $types) {
-            $data[$validProperty] = $this->normalizeValue($this->$validProperty);
+        foreach ($this->getPropertiesList() as $property) {
+            $data[$property] = $this->normalizeValue($this->getPropertyValue($property), 'normalizeData');
         }
 
         return $data;
@@ -365,6 +309,43 @@ trait DataContainerTrait
     public function setPropertyNotValidErrorMessage(string $errorMessage)
     {
         $this->propertyNotValidErrorMessage = $errorMessage;
+    }
+
+    /**
+     * Normalize a property value
+     * @param $value
+     * @param string $contextCall
+     * @return array|string
+     * @throws PropertyValueNormalizationException
+     */
+    private function normalizeValue($value, string $contextCall)
+    {
+        $normalizedValue = $value;
+
+        // object value
+        if (is_object($value)) {
+            if ($value instanceof DateTimeInterface) {
+                // handle DateTime value objects
+                $normalizedValue = $value->format("Y-m-d\TH:i:s.u\Z");
+            } elseif ($value instanceof DataContainerInterface || method_exists($value, $contextCall)) {
+                // handle DataContainer value objects
+                $normalizedValue = $value->normalizeData();
+            } elseif (method_exists($value, 'toString')) {
+                // handle other value objects which have a `toString` method
+                $normalizedValue = $value->toString();
+            } else {
+                throw new PropertyValueNormalizationException(sprintf(
+                        "Value error: object of class [%s] does not implement DataContainerInterface OR does not have a [$contextCall] method",
+                        get_class($value))
+                );
+            }
+        } elseif (is_array($value)) {
+            foreach ($value as $subProperty => $subPropertyValue) {
+                $normalizedValue[$subProperty] = $this->normalizeValue($subPropertyValue, $contextCall);
+            }
+        }
+
+        return $normalizedValue;
     }
 
     /**
@@ -458,10 +439,10 @@ trait DataContainerTrait
                     } elseif ($type === 'number' && is_numeric($value)) {
                         $isValidType = true;
                         break;
-                    } elseif (($type === 'integer' || $type == 'int') && is_int($value)) {
+                    } elseif (($type === 'integer' || $type === 'int') && is_int($value)) {
                         $isValidType = true;
                         break;
-                    } elseif (($type === 'boolean' || $type == 'bool') && is_bool($value)) {
+                    } elseif (($type === 'boolean' || $type === 'bool') && is_bool($value)) {
                         $isValidType = true;
                         break;
                     } elseif ($type === 'null' && $value === null) {
@@ -482,36 +463,6 @@ trait DataContainerTrait
         }
 
         return true;
-    }
-
-    /**
-     * Normalize a property value
-     * @param $value
-     * @return mixed
-     * @throws PropertyValueNormalizationException
-     */
-    protected function normalizeValue($value)
-    {
-        $normalizedValue = $value;
-        // object value
-        if (is_object($value)) {
-            if ($value instanceof DateTimeInterface) {
-                $normalizedValue = $value->format("Y-m-d\TH:i:s.u\Z");
-            } elseif ($value instanceof DataContainerInterface || method_exists($value, 'normalizeData')) {
-                $normalizedValue = $value->normalizeData();
-            } else {
-                throw new PropertyValueNormalizationException(sprintf(
-                        "Value error: object of class [%s] does not implement DataContainerInterface OR does not have a [normalizeData] method",
-                        get_class($value))
-                );
-            }
-        } elseif (is_array($value)) {
-            foreach ($value as $arrProperty => $arrValue) {
-                $normalizedValue[$arrProperty] = $this->normalizeValue($arrValue);
-            }
-        }
-
-        return $normalizedValue;
     }
 
 }

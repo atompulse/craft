@@ -6,6 +6,7 @@ namespace Craft\Data\Container;
  * Interface for a DataContainer concept
  * A DataContainer is a fine tuned data structure which holds and exposes data.
  * The container is a passive Object, its not an classical Object (as it SHOULD NOT and DOES NOT provide behaviour).
+ * A DataContainer SHOULD maintain and guarantee the integrity of its internal constraints.
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *
@@ -54,10 +55,22 @@ interface DataContainerInterface
     public function getPropertiesList(): array;
 
     /**
-     * Get data as array
+     * Return ONLY the current state of data
+     * - will not return default property values or property values that have not been explicitly set.
+     * - handles DataContainerInterface property values normalization
+     * - return simple array with key->value OR multidimensional array with key->array but never object values
      * @return array
      */
     public function toArray(): array;
+
+    /**
+     * Normalize all properties of this container:
+     * - handles default value resolution
+     * - handles DataContainerInterface property values normalization
+     * - return simple array with key->value OR multidimensional array with key->array but never object values
+     * @return array
+     */
+    public function normalizeData(): array;
 
     /**
      * Add data from array
@@ -67,13 +80,4 @@ interface DataContainerInterface
      */
     public function fromArray(array $data, bool $skipExtraProperties = true, bool $skipMissingProperties = true): void;
 
-    /**
-     * Normalize all properties of this container:
-     * - handles default value resolution
-     * - handles DataContainerInterface property values normalization
-     * - return simple array with key->value OR multidimensional array with key->array but never object values
-     * @param string|null $property
-     * @return mixed
-     */
-    public function normalizeData(string $property = null): array;
 }
