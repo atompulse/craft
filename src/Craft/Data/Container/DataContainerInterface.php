@@ -24,9 +24,9 @@ interface DataContainerInterface
     /**
      * Populate a property with value
      * @param string $property
-     * @param $value
+     * @param $propertyValue
      */
-    public function addPropertyValue(string $property, $value): void;
+    public function addPropertyValue(string $property, $propertyValue): void;
 
     /**
      * Get a property value

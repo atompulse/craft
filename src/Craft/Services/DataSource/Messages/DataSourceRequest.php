@@ -71,7 +71,7 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
      */
     public function getFilters(): array
     {
-        return $this->getPropertyValue('filters');
+        return $this->getPropertyValue('filters') ?? [];
     }
 
     /**
@@ -103,7 +103,7 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
      */
     public function getSorters(): array
     {
-        return $this->getPropertyValue('sorters');
+        return $this->getPropertyValue('sorters') ?? [];
     }
 
 }

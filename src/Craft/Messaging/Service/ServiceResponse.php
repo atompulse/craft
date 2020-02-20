@@ -3,6 +3,7 @@
 namespace Craft\Messaging\Service;
 
 use Craft\Data\Container\DataContainerTrait;
+use Craft\Exception\ContextualErrorInterface;
 use Craft\Messaging\ResponseInterface;
 
 /**
@@ -27,17 +28,26 @@ class ServiceResponse implements ResponseInterface
         }
     }
 
+    /**
+     * @return string
+     */
     public function getStatus(): string
     {
-        return $this->properties['status'] ?? ServiceStatusCodes::OK;
+        return $this->getPropertyValue('status') ?? ServiceStatusCodes::OK;
     }
 
+    /**
+     * @return array|null
+     */
     public function getErrors(): ?array
     {
-        return $this->properties['errors'] ?? null;
+        return $this->getPropertyValue('errors') ?? null;
     }
 
-    public function addError(ServiceError $error)
+    /**
+     * @param ContextualErrorInterface $error
+     */
+    public function addError(ContextualErrorInterface $error): void
     {
         $this->addPropertyValue('errors', $error);
     }

@@ -36,7 +36,7 @@ class ContextualError implements ContextualErrorInterface
      */
     public function getMessage(): string
     {
-        return $this->properties['message'];
+        return $this->getPropertyValue('message');
     }
 
     /**
@@ -44,6 +44,6 @@ class ContextualError implements ContextualErrorInterface
      */
     public function getContext(): string
     {
-        return $this->properties['context'];
+        return $this->getPropertyValue('context');
     }
 }

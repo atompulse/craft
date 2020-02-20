@@ -108,7 +108,7 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
 
             $argRequest = $this->argumentBuilder->build($params, $argClass);
 
-            $this->logger->info("Resolved request object " . get_class($argRequest) . " (" . json_encode($argRequest->toArray()) . ") from input parameters", [$params]);
+            $this->logger->info("Resolved request object " . get_class($argRequest) . " (" . json_encode($argRequest->normalizeData()) . ") from input parameters", [$params]);
 
             yield $argRequest;
         } catch (Throwable $err) {

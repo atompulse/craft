@@ -34,27 +34,27 @@ trait UserDataTrait
 
     public function getExpires(): bool
     {
-        return $this->properties['expires'] ?? null;
+        return $this->getPropertyValue('expires') ?? null;
     }
 
     public function getExpireDate(): string
     {
-        return $this->properties['expireDate'] ?? null;
+        return $this->getPropertyValue('expireDate') ?? null;
     }
 
     public function getId(): int
     {
-        return $this->properties['id'] ?? null;
+        return $this->getPropertyValue('id') ?? null;
     }
 
     public function getEmail(): string
     {
-        return $this->properties['email'] ?? null;
+        return $this->getPropertyValue('email') ?? null;
     }
 
     public function getRole(): string
     {
-        return $this->properties['role'] ?? null;
+        return $this->getPropertyValue('role') ?? null;
     }
 
 }

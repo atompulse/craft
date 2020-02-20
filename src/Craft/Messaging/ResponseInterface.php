@@ -3,7 +3,8 @@
 namespace Craft\Messaging;
 
 use Craft\Data\Container\DataContainerInterface;
-use Craft\Messaging\Service\ServiceError;
+use Craft\Exception\ContextualErrorInterface;
+
 
 /**
  * Interface ResponseInterface
@@ -13,9 +14,18 @@ use Craft\Messaging\Service\ServiceError;
  */
 interface ResponseInterface extends DataContainerInterface
 {
+    /**
+     * @return string
+     */
     public function getStatus(): string;
 
+    /**
+     * @return array|null
+     */
     public function getErrors(): ?array;
 
-    public function addError(ServiceError $error);
+    /**
+     * @param ContextualErrorInterface $error
+     */
+    public function addError(ContextualErrorInterface $error): void;
 }

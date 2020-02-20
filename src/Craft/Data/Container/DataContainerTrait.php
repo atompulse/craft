@@ -18,7 +18,7 @@ use DateTimeInterface;
 trait DataContainerTrait
 {
     /**
-     * @var array Store to describe the properties of the container and its types
+     * @var array Metadata describing the properties of the container and its types
      * @example:
      *   "code" => "integer|0",
      *   "name" => "string",
@@ -27,7 +27,7 @@ trait DataContainerTrait
      *   "price" => "double",
      *   "products" => "array|null",
      */
-    protected $validProperties = [];
+    protected $metadata = [];
 
     /**
      * Default values store
@@ -36,83 +36,43 @@ trait DataContainerTrait
     protected $defaultValues = [];
 
     /**
-     * @var array Store values of all valid properties.
+     * @var array DataContainer state
      */
-    protected $properties = [];
+    protected $state = [];
 
     /**
      * @var string
      */
-    private $propertyNotValidErrorMessage = 'Property ["%s"] not valid for this class ["%s"]';
+    protected $propertyNotValidErrorMessage = 'Property ["%s"] not valid for this class ["%s"]';
 
     /**
      * Support for public property getting
+     *
      * @param string $property
      * @return mixed
      * @throws PropertyNotValidException
      */
-    public function &__get(string $property)
+    public function __get(string $property)
     {
-        if (!$this->isValidProperty($property)) {
-            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
-        }
-
-        $propertyValue = null;
-
-        // specialized getter method
-        $getterMethod = "get" . StringProcessor::camelize($property);
-
-        if (method_exists($this, $getterMethod)) {
-            $propertyValue = $this->$getterMethod();
-        } else {
-            // default value when property was not set
-            if (!array_key_exists($property, $this->properties) && array_key_exists($property, $this->defaultValues)) {
-                $propertyValue = &$this->defaultValues[$property];
-            } elseif (array_key_exists($property, $this->properties)) {
-                $propertyValue = &$this->properties[$property];
-            }
-        }
-
-        return $propertyValue;
+        return $this->isValidProperty($property) && $this->hasPropertyApi($property, 'GET') ?
+            $this->{$this->makePropertyApiMethodName($property, 'GET')}() :
+            $this->getPropertyValue($property);
     }
 
     /**
      * Support for public property setting
+     *
      * @param string $property
      * @param mixed $value Value of property
      * @return void
      * @throws PropertyValueNotValidException Thrown if property valuetype is inconsistent
      * @throws PropertyNotValidException Thrown if property is not defined in validProperties
      */
-    public function __set(string $property, $value)
+    public function __set(string $property, $value): void
     {
-        if (!$this->isValidProperty($property)) {
-            throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
-        }
-
-        // Check if there's a specialized setter method
-        $setterMethod = "set" . StringProcessor::camelize($property);
-        if (method_exists($this, $setterMethod)) {
-            $this->$setterMethod($value);
-            // if custom setter did not "initialized" the property then
-            // by default we assume the user "left" the property as null
-            if (!array_key_exists($property, $this->properties)) {
-                $this->properties[$property] = null;
-            }
-        } else {
-            $integrityConstraints = $this->getIntegritySpecification($property);
-            // add to array property type
-            if (in_array('array', $integrityConstraints) && !is_array($value)) {
-                $this->properties[$property][] = $value;
-            } else {
-                $this->properties[$property] = $value;
-            }
-        }
-
-        // perform property value type checking
-        // performed last in order to be able to test the validity
-        // of property values that had been set using a custom setter
-        $this->checkTypes($property, $this->properties[$property]);
+        $this->isValidProperty($property) && $this->hasPropertyApi($property, 'SET') ?
+            $this->{$this->makePropertyApiMethodName($property, 'SET')}($value) :
+            $this->addPropertyValue($property, $value);
     }
 
     /**
@@ -122,7 +82,7 @@ trait DataContainerTrait
      */
     public function __isset($name)
     {
-        return isset($this->properties[$name]);
+        return isset($this->state[$name]);
     }
 
     /**
@@ -131,7 +91,7 @@ trait DataContainerTrait
      */
     public function __unset($name)
     {
-        unset($this->properties[$name]);
+        unset($this->state[$name]);
     }
 
     /**
@@ -142,7 +102,7 @@ trait DataContainerTrait
      */
     public function defineProperty(string $property, array $constraints = [], $defaultValue = null): void
     {
-        $this->validProperties[$property] = $constraints;
+        $this->metadata[$property] = $constraints;
 
         if (!is_null($defaultValue)) {
             $this->defaultValues[$property] = $defaultValue;
@@ -150,12 +110,12 @@ trait DataContainerTrait
     }
 
     /**
-     * Get the defined list of properties
+     * Get the properties with associated metadata
      * @return array
      */
     public function getProperties(): array
     {
-        return $this->validProperties;
+        return $this->metadata;
     }
 
     /**
@@ -164,7 +124,7 @@ trait DataContainerTrait
      */
     public function getPropertiesList(): array
     {
-        return array_keys($this->validProperties);
+        return array_keys($this->metadata);
     }
 
     /**
@@ -172,25 +132,24 @@ trait DataContainerTrait
      * @info Usage of $this->properties[$property] = $value / $this->properties[$property][] = $value
      * should be avoided, use addPropertyValue instead.
      * @param string $property
-     * @param $value
+     * @param $propertyValue
      * @throws PropertyNotValidException
      */
-    public function addPropertyValue(string $property, $value): void
+    public function addPropertyValue(string $property, $propertyValue): void
     {
         if (!$this->isValidProperty($property)) {
             throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
         }
 
-        $integrityConstraints = $this->getIntegritySpecification($property);
-        // add to array property type
-        if (in_array('array', $integrityConstraints) && !is_array($value)) {
-            $this->properties[$property][] = $value;
-        } else {
-            $this->properties[$property] = $value;
-        }
+        // perform value type checking
+        $this->checkTypes($property, $propertyValue);
 
-        // perform property value type checking
-        $this->checkTypes($property, $this->properties[$property]);
+        // add to array property type
+        if (in_array('array', $this->getIntegritySpecification($property)) && !is_array($propertyValue)) {
+            $this->state[$property][] = $propertyValue;
+        } else {
+            $this->state[$property] = $propertyValue;
+        }
     }
 
     /**
@@ -199,28 +158,26 @@ trait DataContainerTrait
      * @return mixed
      * @throws PropertyNotValidException
      */
-    public function getPropertyValue(string $property)
+    public function &getPropertyValue(string $property)
     {
         if (!$this->isValidProperty($property)) {
             throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
         }
 
-        $propertyValue = null;
-
         // default value when property was not set
-        if (!array_key_exists($property, $this->properties) && array_key_exists($property, $this->defaultValues)) {
+        if (!array_key_exists($property, $this->state) && array_key_exists($property, $this->defaultValues)) {
             $propertyValue = &$this->defaultValues[$property];
-        } elseif (array_key_exists($property, $this->properties)) {
-            $propertyValue = &$this->properties[$property];
+        } elseif (array_key_exists($property, $this->state)) {
+            $propertyValue = &$this->state[$property];
         }
 
         return $propertyValue;
     }
 
     /**
-     * Get the DataContainer's current state as an array
+     * Get the DataContainer's current internal state as an array
      *
-     * This method WILL NOT return default values or property values that have not been explicitly added.
+     * This method WILL NOT return default values or property values that HAD NOT BEEN explicitly populated.
      *
      * @return array [key => value] Data structure
      *
@@ -230,7 +187,9 @@ trait DataContainerTrait
     {
         $data = [];
 
-        foreach ($this->properties as $property => $value) {
+        foreach ($this->state as $property => $internalValue) {
+            $value = $this->hasPropertyApi($property, 'GET') ?
+                $this->{$this->makePropertyApiMethodName($property, 'GET')}() : $internalValue;
             $data[$property] = $this->normalizeValue($value, 'toArray');
         }
 
@@ -247,7 +206,7 @@ trait DataContainerTrait
      */
     public function fromArray(array $data, bool $skipExtraProperties = true, bool $skipMissingProperties = true): void
     {
-        $extraProperties = array_keys(array_diff_key($data, $this->validProperties));
+        $extraProperties = array_keys(array_diff_key($data, $this->metadata));
 
         if (!$skipExtraProperties && count($extraProperties)) {
             throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, implode(',', $extraProperties), get_class($this)));
@@ -279,7 +238,10 @@ trait DataContainerTrait
         $data = [];
 
         foreach ($this->getPropertiesList() as $property) {
-            $data[$property] = $this->normalizeValue($this->getPropertyValue($property), 'normalizeData');
+            $value = $this->hasPropertyApi($property, 'GET') ?
+                $this->{$this->makePropertyApiMethodName($property, 'GET')}() :
+                $this->getPropertyValue($property);
+            $data[$property] = $this->normalizeValue($value, 'normalizeData');
         }
 
         return $data;
@@ -292,7 +254,7 @@ trait DataContainerTrait
      */
     public function isValidProperty(string $property): bool
     {
-        if (!empty($this->validProperties) && !array_key_exists($property, $this->validProperties)) {
+        if (!empty($this->metadata) && !array_key_exists($property, $this->metadata)) {
             return false;
         }
 
@@ -314,11 +276,11 @@ trait DataContainerTrait
     /**
      * Normalize a property value
      * @param $value
-     * @param string $contextCall
+     * @param string $contextNormalizer
      * @return array|string
      * @throws PropertyValueNormalizationException
      */
-    private function normalizeValue($value, string $contextCall)
+    private function normalizeValue($value, string $contextNormalizer)
     {
         $normalizedValue = $value;
 
@@ -327,25 +289,53 @@ trait DataContainerTrait
             if ($value instanceof DateTimeInterface) {
                 // handle DateTime value objects
                 $normalizedValue = $value->format("Y-m-d\TH:i:s.u\Z");
-            } elseif ($value instanceof DataContainerInterface || method_exists($value, $contextCall)) {
+            } elseif ($value instanceof DataContainerInterface || method_exists($value, $contextNormalizer)) {
                 // handle DataContainer value objects
-                $normalizedValue = $value->normalizeData();
+                $normalizedValue = $value->{$contextNormalizer}();
             } elseif (method_exists($value, 'toString')) {
                 // handle other value objects which have a `toString` method
                 $normalizedValue = $value->toString();
             } else {
                 throw new PropertyValueNormalizationException(sprintf(
-                        "Value error: object of class [%s] does not implement DataContainerInterface OR does not have a [$contextCall] method",
+                        "Value error: object of class [%s] does not implement DataContainerInterface OR does not have a [$contextNormalizer] method",
                         get_class($value))
                 );
             }
         } elseif (is_array($value)) {
             foreach ($value as $subProperty => $subPropertyValue) {
-                $normalizedValue[$subProperty] = $this->normalizeValue($subPropertyValue, $contextCall);
+                $normalizedValue[$subProperty] = $this->normalizeValue($subPropertyValue, $contextNormalizer);
             }
         }
 
         return $normalizedValue;
+    }
+
+    /**
+     * Check if a property has a predefined accessor/mutator
+     * @param string $property
+     * @param string $context
+     * @return bool
+     */
+    private function hasPropertyApi(string $property, string $context): bool
+    {
+        return method_exists($this, $this->makePropertyApiMethodName($property, $context));
+    }
+
+    /**
+     * Make a property api method name
+     * @param string $property
+     * @param string $context
+     * @return string
+     */
+    private function makePropertyApiMethodName(string $property, string $context): string
+    {
+        $propertyApi = 'set' . StringProcessor::camelize($property);
+
+        if ($context === 'GET') {
+            $propertyApi = 'get' . StringProcessor::camelize($property);
+        }
+
+        return $propertyApi;
     }
 
     /**
@@ -355,7 +345,7 @@ trait DataContainerTrait
      */
     private function getIntegritySpecification(string $property)
     {
-        $allConstraints = $this->validProperties[$property];
+        $allConstraints = $this->metadata[$property];
 
         if (!is_array($allConstraints)) {
             $constraints = $this->parseIntegritySpecification($allConstraints);
@@ -420,7 +410,7 @@ trait DataContainerTrait
                             get_class($this),
                             $property,
                             implode(',', $integrityConstraints),
-                            $value
+                            get_class($value)
                         ));
                 }
             } else {
