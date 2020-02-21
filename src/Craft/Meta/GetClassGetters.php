@@ -5,15 +5,15 @@ namespace Craft\Meta;
 use Craft\Data\Processor\ArrayProcessor;
 
 /**
- * Class GetClassSetters
+ * Class GetClassGetters
  *
  * @author Petru Cojocar <petru.cojocar@gmail.com>
  *
  */
-class GetClassSetters
+class GetClassGetters
 {
     public function __invoke(string $class)
     {
-        return ArrayProcessor::filterArrayValuesStartingWith(get_class_methods($class), 'set');
+        return ArrayProcessor::filterArrayValuesStartingWith(get_class_methods($class), 'get');
     }
 }
