@@ -219,7 +219,10 @@ trait DataContainerTrait
             if (!$propertyIsPresent && !$skipMissingProperties) {
                 throw new PropertyMissingException(sprintf("Property [%s] is missing from input array when using %s->fromArray", $property, get_class($this)));
             } elseif ($propertyIsPresent) {
-                $this->addPropertyValue($property, $data[$property]);
+                $this->hasPropertyApi($property, 'SET') ?
+                    $this->{$this->makePropertyApiMethodName($property, 'SET')}($data[$property]) :
+                    $this->addPropertyValue($property, $data[$property]);
+
             }
         }
 
