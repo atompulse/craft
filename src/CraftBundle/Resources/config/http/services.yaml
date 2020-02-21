@@ -31,7 +31,6 @@ services:
   Craft\Http\Controller\ActionArgumentResolver:
     arguments:
       - '@logger'
-      - '@security.helper'
       - '@craft.http.controller.action_argument_builder'
     tags:
       - { name: controller.argument_value_resolver, priority: 50 }
