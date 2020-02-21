@@ -8,7 +8,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\Security\Core\Security;
 use Exception;
 use Generator;
 use Throwable;
@@ -31,23 +30,15 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
     private $logger;
 
     /**
-     * @var Security
-     */
-    private $security;
-
-    /**
      * ActionArgumentResolver constructor.
      * @param LoggerInterface $logger
-     * @param Security $security
      * @param ActionArgumentBuilderInterface $argumentBuilder
      */
     public function __construct(
         LoggerInterface $logger,
-        Security $security,
         ActionArgumentBuilderInterface $argumentBuilder
     ) {
         $this->logger = $logger;
-        $this->security = $security;
         $this->argumentBuilder = $argumentBuilder;
     }
 
