@@ -86,7 +86,7 @@ class ArrayProcessor
     {
         $transformed = [];
         foreach ($data as $camelKey => $value) {
-            $transformed[self::unCamelize($camelKey)] = $value;
+            $transformed[StringProcessor::unCamelize($camelKey)] = $value;
         }
 
         return $transformed;
@@ -102,10 +102,23 @@ class ArrayProcessor
         $transformed = [];
         foreach ($arrData as $index => $data) {
             foreach ($data as $camelKey => $value) {
-                $transformed[$index][self::unCamelize($camelKey)] = $value;
+                $transformed[$index][StringProcessor::unCamelize($camelKey)] = $value;
             }
         }
 
         return $transformed;
+    }
+
+    /**
+     * Filter an array with string values by a starting string
+     * @param array $array
+     * @param string $startingWith
+     * @return array
+     */
+    public static function filterArrayValuesStartingWith(array $array, string $startingWith)
+    {
+        return array_filter($array, function ($url) use ($startingWith) {
+            return (stripos($url, $startingWith) !== false && stripos($url, $startingWith) === 0);
+        });
     }
 }
