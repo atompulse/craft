@@ -2,11 +2,14 @@
 
 namespace Craft\Http\Controller;
 
+use Craft\Data\Processor\StringProcessor;
 use Craft\Data\Validation\ArrayValidatorInterface;
 use Craft\Data\Validation\RequestValidatorInterface;
 use Craft\Http\Controller\Exception\ActionArgumentException;
 use Craft\Messaging\RequestInterface;
 use Craft\Messaging\Service\ServiceStatusCodes;
+use Craft\Meta\GetClassSetters;
+use ReflectionClass;
 
 
 /**
@@ -37,7 +40,7 @@ class ActionArgumentBuilder implements ActionArgumentBuilderInterface
     public function build(array $inputData, string $inputClass): RequestInterface
     {
         /** @var RequestInterface $argument */
-        $argument = (new \ReflectionClass($inputClass))->newInstance();
+        $argument = (new ReflectionClass($inputClass))->newInstance();
 
         $errors = $this->validator->validate($inputData, $argument->getValidatorConstraints());
 
@@ -57,18 +60,31 @@ class ActionArgumentBuilder implements ActionArgumentBuilderInterface
     }
 
     /**
+     * Populate the data container object
      * @param RequestInterface $object
      * @param array $inputData
      */
     protected function populate(RequestInterface $object, array $inputData)
     {
         $props = $object->getProperties();
+        $setters = (new GetClassSetters())(get_class($object));
 
         foreach ($props as $prop => $integrityConstraints) {
             if (array_key_exists($prop, $inputData)) {
                 // type MUST be the first item
                 $propType = $integrityConstraints[0];
-                $object->$prop = $this->resolvePrimitiveValue($inputData[$prop], $propType);
+                // container property api
+                $setter = 'set' . StringProcessor::camelize($prop);
+                // resolve value
+                $value = $this->resolvePrimitiveValue($inputData[$prop], $propType);
+
+                if (in_array($setter, $setters)) {
+                    // if property api present then it has priority
+                    $object->$setter($value);
+                } else {
+                    // use standard api
+                    $object->addPropertyValue($prop, $value);
+                }
             }
         }
     }
@@ -77,7 +93,7 @@ class ActionArgumentBuilder implements ActionArgumentBuilderInterface
      * Convert string to correct primitive type
      * @param $stringValue
      * @param string $propType
-     * @return bool|float|int|string
+     * @return bool|float|int|string|array
      */
     protected function resolvePrimitiveValue($stringValue, string $propType)
     {
