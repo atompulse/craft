@@ -3,6 +3,8 @@
 namespace Craft\Data\Validation;
 
 use Doctrine\Common\Inflector\Inflector;
+use LogicException;
+use ReflectionClass;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -24,13 +26,13 @@ trait DataValidatorTrait
             $metadata = $this->getProperties();
 
             foreach ($metadata as $propertyName => $constraints) {
-                $validatorConstraints[$propertyName] = $this->translateConstraints($constraints);
+                $validatorConstraints[$propertyName] = $this->translateConstraints($propertyName, $constraints);
             }
 
             return $validatorConstraints;
         }
 
-        throw new \LogicException("DataValidatorTrait MUST be attached on DataContainerInterface classes only");
+        throw new LogicException("DataValidatorTrait MUST be attached on DataContainerInterface classes only");
 
     }
 
@@ -38,7 +40,7 @@ trait DataValidatorTrait
      * @param array $constraints
      * @return array
      */
-    private function translateConstraints(array $constraints)
+    private function translateConstraints(string $propertyName, array $constraints)
     {
         $validatorConstraints = [];
         $nullable = false;
@@ -82,7 +84,10 @@ trait DataValidatorTrait
                     // try to determine if its a symfony validator before giving up
                     $constraintClass = '\Symfony\Component\Validator\Constraints\\' . $this->buildConstraintName($constraintName);
 
-                        $factory = new \ReflectionClass($constraintClass);
+                    if (class_exists($constraintClass)) {
+
+                        $factory = new ReflectionClass($constraintClass);
+
                         if ($hasArguments) {
                             $constraintInstance = $factory->newInstance($args);
                         } else {
@@ -90,7 +95,11 @@ trait DataValidatorTrait
                         }
 
                         $validatorConstraints[] = $constraintInstance;
-
+                    } else {
+                        throw new LogicException(sprintf(
+                            "[%s] is not a valid Symfony Validator Constraint, declared for property [%s] of %s",
+                            $constraintName, $propertyName, get_class($this)));
+                    }
 
                     break;
             }
