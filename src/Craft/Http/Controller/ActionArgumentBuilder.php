@@ -3,8 +3,7 @@
 namespace Craft\Http\Controller;
 
 use Craft\Data\Processor\StringProcessor;
-use Craft\Data\Validation\ArrayValidatorInterface;
-use Craft\Data\Validation\RequestValidatorInterface;
+use Craft\Data\Validation\StructuredDataValidatorInterface;
 use Craft\Http\Controller\Exception\ActionArgumentException;
 use Craft\Messaging\RequestInterface;
 use Craft\Messaging\Service\ServiceStatusCodes;
@@ -21,11 +20,11 @@ use ReflectionClass;
 class ActionArgumentBuilder implements ActionArgumentBuilderInterface
 {
     /**
-     * @var RequestValidatorInterface
+     * @var StructuredDataValidatorInterface
      */
     private $validator;
 
-    public function __construct(ArrayValidatorInterface $validator)
+    public function __construct(StructuredDataValidatorInterface $validator)
     {
         $this->validator = $validator;
     }
@@ -39,10 +38,7 @@ class ActionArgumentBuilder implements ActionArgumentBuilderInterface
      */
     public function build(array $inputData, string $inputClass): RequestInterface
     {
-        /** @var RequestInterface $argument */
-        $argument = (new ReflectionClass($inputClass))->newInstance();
-
-        $errors = $this->validator->validate($inputData, $argument->getValidatorConstraints());
+        $errors = $this->validator->validate($inputData, $inputClass);
 
         if (count($errors)) {
             $err = new ActionArgumentException(ServiceStatusCodes::INVALID_INPUT);
@@ -51,23 +47,25 @@ class ActionArgumentBuilder implements ActionArgumentBuilderInterface
                     $err->addError($error);
                 }
             }
+            // stop execution
             throw $err;
         }
 
-        $this->populate($argument, $inputData);
-
-        return $argument;
+        return $this->populate($inputClass, $inputData);
     }
 
     /**
-     * Populate the data container object
-     * @param RequestInterface $object
+     * @param string $inputClass
      * @param array $inputData
+     * @return RequestInterface
      */
-    protected function populate(RequestInterface $object, array $inputData)
+    protected function populate(string $inputClass, array $inputData): RequestInterface
     {
+        /** @var RequestInterface $object */
+        $object = (new ReflectionClass($inputClass))->newInstance();
+
         $props = $object->getProperties();
-        $setters = (new GetClassSetters())(get_class($object));
+        $setters = (new GetClassSetters())($inputClass);
 
         foreach ($props as $prop => $integrityConstraints) {
             if (array_key_exists($prop, $inputData)) {
@@ -87,6 +85,8 @@ class ActionArgumentBuilder implements ActionArgumentBuilderInterface
                 }
             }
         }
+
+        return $object;
     }
 
     /**
