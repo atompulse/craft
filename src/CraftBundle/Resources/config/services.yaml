@@ -2,13 +2,7 @@ parameters:
   craft.env: '%env(APP_ENV)%'
 
 imports:
+  - { resource: data/services.yaml }
+  - { resource: messaging/services.yaml }
   - { resource: http/services.yaml }
   - { resource: security/services.yaml }
-
-services:
-
-  Craft\Data\Validation\ArrayValidatorInterface: '@craft.data.validation.array_validator'
-  craft.data.validation.array_validator:
-    class: Craft\Data\Validation\ArrayValidator
-    arguments:
-      - '@Symfony\Component\Validator\Validator\ValidatorInterface'

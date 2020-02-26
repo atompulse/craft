@@ -1,0 +1,6 @@
+services:
+  Craft\Messaging\Validator\RequestValidatorInterface: '@craft.messaging.validator.request_validator'
+  craft.messaging.validator.request_validator:
+    class: Craft\Messaging\Validator\RequestValidator
+    arguments:
+      - '@craft.data.validation.structured_data_validator'

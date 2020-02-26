@@ -1,0 +1,13 @@
+services:
+
+  Craft\Data\Validation\RecursiveValidatorInterface: '@craft.data.validation.recursive_validator'
+  craft.data.validation.recursive_validator:
+    class: Craft\Data\Validation\RecursiveValidator
+    arguments:
+      - '@Symfony\Component\Validator\Validator\ValidatorInterface'
+
+  Craft\Data\Validation\StructuredDataValidatorInterface: '@craft.data.validation.structured_data_validator'
+  craft.data.validation.structured_data_validator:
+    class: Craft\Data\Validation\StructuredDataValidator
+    arguments:
+      - '@craft.data.validation.recursive_validator'

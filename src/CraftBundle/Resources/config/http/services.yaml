@@ -5,14 +5,7 @@ services:
   Craft\Http\Controller\ActionArgumentBuilder:
     class: Craft\Http\Controller\ActionArgumentBuilder
     arguments:
-      - '@craft.data.validation.array_validator'
-
-
-  Craft\Data\Validation\RequestValidatorInterface: '@craft.data.validation.request_validator'
-  craft.data.validation.request_validator:
-    class: Craft\Data\Validation\RequestValidator
-    arguments:
-      - '@Craft\Data\Validation\ArrayValidatorInterface'
+      - '@craft.data.validation.structured_data_validator'
 
   # Resolve JSON POST body
   Craft\Http\EventListener\JsonPostDataResolverListener:
