@@ -26,6 +26,10 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
         $this->defineProperty('sorters', ['array', 'null']);
         $this->defineProperty('filters', ['array', 'null']);
 
+        // preset defaults
+        $this->addPropertyValue('sorters', []);
+        $this->addPropertyValue('filters', []);
+
         if ($data !== null) {
             $this->fromArray($data, true, false);
         }
@@ -59,10 +63,13 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
     /**
      * @param array $filters
      */
-    public function setFilters(array $filters): void
+    public function setFilters(array $filters = null): void
     {
-        foreach ($filters as $filterKey => $filterValue) {
-            $this->addFilter($filterKey, $filterValue);
+        if ($filters && count($filters)) {
+            foreach ($filters as $filterKey => $filterValue) {
+                $this->addFilter($filterKey, $filterValue);
+            }
+
         }
     }
 
@@ -91,10 +98,12 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
     /**
      * @param array $sorters
      */
-    public function setSorters(array $sorters): void
+    public function setSorters(array $sorters = null): void
     {
-        foreach ($sorters as $key => $direction) {
-            $this->addSorter($key, $direction);
+        if ($sorters && count($sorters)) {
+            foreach ($sorters as $key => $direction) {
+                $this->addSorter($key, $direction);
+            }
         }
     }
 
