@@ -2,8 +2,6 @@
 
 namespace Craft\Data\Validation;
 
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-
 /**
  * Interface DataValidatorInterface
  *
@@ -13,7 +11,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 interface DataValidatorInterface
 {
     /**
-     * A list of
+     * MUST return a list of Symfony Validation Constraints
      * @return array
      */
     public function getValidatorConstraints(): array;
