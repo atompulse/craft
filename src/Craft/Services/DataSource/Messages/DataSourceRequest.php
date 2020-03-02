@@ -52,12 +52,11 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
     }
 
     /**
-     * @param string $key
-     * @param $value
+     * @param FilterValue $filter
      */
-    public function addFilter(string $key, $value): void
+    public function addFilter(FilterValue $filter): void
     {
-        $this->addPropertyValue('filters', new FilterValue($key, $value));
+        $this->addPropertyValue('filters', $filter);
     }
 
     /**
@@ -66,10 +65,9 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
     public function setFilters(array $filters = null): void
     {
         if ($filters && count($filters)) {
-            foreach ($filters as $filterKey => $filterValue) {
-                $this->addFilter($filterKey, $filterValue);
+            foreach ($filters as $filter) {
+                $this->addFilter(new FilterValue($filter));
             }
-
         }
     }
 
@@ -82,17 +80,11 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
     }
 
     /**
-     * @param string $key
-     * @param string $direction
-     * @throws \Exception
+     * @param SorterValue $sorter
      */
-    public function addSorter(string $key, string $direction = self::SORT_ASC): void
+    public function addSorter(SorterValue $sorter): void
     {
-        if ($direction === self::SORT_ASC || $direction === self::SORT_DESC) {
-            $this->addPropertyValue('sorters', new SorterValue($key, $direction));
-        }
-
-        throw new \Exception("Unrecognized sorter direction [$direction]");
+        $this->addPropertyValue('sorters', $sorter);
     }
 
     /**
@@ -101,8 +93,8 @@ class DataSourceRequest extends ServiceRequest implements DataSourceRequestInter
     public function setSorters(array $sorters = null): void
     {
         if ($sorters && count($sorters)) {
-            foreach ($sorters as $key => $direction) {
-                $this->addSorter($key, $direction);
+            foreach ($sorters as $sorter) {
+                $this->addSorter(new SorterValue($sorter));
             }
         }
     }

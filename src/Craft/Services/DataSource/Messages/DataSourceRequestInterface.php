@@ -3,6 +3,8 @@
 namespace Craft\Services\DataSource\Messages;
 
 use Craft\Messaging\RequestInterface;
+use Craft\Services\DataSource\Data\FilterValue;
+use Craft\Services\DataSource\Data\SorterValue;
 
 /**
  * Interface DataSourceRequestInterface
@@ -17,9 +19,6 @@ use Craft\Messaging\RequestInterface;
  */
 interface DataSourceRequestInterface extends RequestInterface
 {
-    const SORT_ASC = 'asc';
-    const SORT_DESC = 'asc';
-
     /**
      * @return int
      */
@@ -31,10 +30,9 @@ interface DataSourceRequestInterface extends RequestInterface
     public function getPageSize(): int;
 
     /**
-     * @param string $field
-     * @param string $direction
+     * @param SorterValue $sorter
      */
-    public function addSorter(string $field, string $direction = self::SORT_ASC): void;
+    public function addSorter(SorterValue $sorter): void;
 
     /**
      * @param array $sorters
@@ -47,10 +45,9 @@ interface DataSourceRequestInterface extends RequestInterface
     public function getSorters(): array;
 
     /**
-     * @param string $field
-     * @param $value
+     * @param FilterValue $filter
      */
-    public function addFilter(string $field, $value): void;
+    public function addFilter(FilterValue $filter): void;
 
     /**
      * @param array $filters

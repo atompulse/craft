@@ -17,12 +17,13 @@ class FilterValue implements DataContainerInterface
 {
     use DataContainerTrait;
 
-    public function __construct(string $key, $value)
+    public function __construct(array $data = null)
     {
         $this->defineProperty('key', ['string']);
         $this->defineProperty('value');
 
-        $this->addPropertyValue('key', $key);
-        $this->addPropertyValue('value', $value);
+        if (!is_null($data)) {
+            $this->fromArray($data, true, false);
+        }
     }
 }

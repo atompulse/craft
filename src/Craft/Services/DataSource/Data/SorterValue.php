@@ -4,6 +4,8 @@ namespace Craft\Services\DataSource\Data;
 
 use Craft\Data\Container\DataContainerInterface;
 use Craft\Data\Container\DataContainerTrait;
+use LogicException;
+
 
 /**
  * Class SorterValue
@@ -17,12 +19,26 @@ class SorterValue implements DataContainerInterface
 {
     use DataContainerTrait;
 
-    public function __construct(string $key, string $value)
+    public function __construct(array $data = null)
     {
         $this->defineProperty('key', ['string']);
         $this->defineProperty('value', ['string']);
 
-        $this->addPropertyValue('key', $key);
-        $this->addPropertyValue('value', $value);
+        if (!is_null($data)) {
+            $this->fromArray($data, true, false);
+        }
+    }
+
+    /**
+     * @param $value
+     */
+    public function setValue($value): void
+    {
+        if (in_array($value, SortingTypes::get())) {
+            $this->addPropertyValue('value', $value);
+        } else {
+            throw new LogicException("Unrecognized SortingType [$value]");
+        }
+
     }
 }
