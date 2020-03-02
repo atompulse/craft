@@ -2,6 +2,7 @@
 
 namespace Craft\Http\Controller;
 
+use Craft\Data\Container\Exception\PropertyValueLogicException;
 use Craft\Data\Processor\StringProcessor;
 use Craft\Data\Validation\StructuredDataValidatorInterface;
 use Craft\Http\Controller\Exception\ActionArgumentException;
@@ -51,7 +52,19 @@ class ActionArgumentBuilder implements ActionArgumentBuilderInterface
             throw $err;
         }
 
-        return $this->populate($inputClass, $inputData);
+        try {
+            $actionArgument = $this->populate($inputClass, $inputData);
+        } catch (PropertyValueLogicException $e) {
+            // handle PropertyValueLogicException exceptions thrown during DataContainer population
+            $err = new ActionArgumentException(ServiceStatusCodes::INVALID_INPUT);
+            foreach ($e->getErrors() as $contextualError) {
+                $err->addError($contextualError);
+            }
+            // stop execution
+            throw $err;
+        }
+
+        return $actionArgument;
     }
 
     /**
