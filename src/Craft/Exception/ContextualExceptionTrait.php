@@ -16,19 +16,18 @@ trait ContextualExceptionTrait
     protected $errors = [];
 
     /**
+     * Get the list of ContextualErrorInterface errors
+     *
      * @return array
      */
     public function getErrors(): array
     {
-        $errors = [];
-        foreach ($this->errors as $error) {
-            $errors[] = $error->normalizeData();
-        }
-
-        return $errors;
+        return $this->errors;
     }
 
     /**
+     * Add a ContextualErrorInterface error
+     *
      * @param ContextualErrorInterface $error
      * @return $this
      */
