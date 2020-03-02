@@ -141,13 +141,19 @@ trait DataContainerTrait
             throw new PropertyNotValidException(sprintf($this->propertyNotValidErrorMessage, $property, get_class($this)));
         }
 
-        // perform value type checking
-        $this->checkTypes($property, $propertyValue);
-
         // add to array property type
         if (in_array('array', $this->getIntegritySpecification($property)) && !is_array($propertyValue)) {
-            $this->state[$property][] = $propertyValue;
+            if (is_null($this->getPropertyValue($property)) && !is_null($propertyValue)) {
+                // store array value
+                $this->state[$property][] = $propertyValue;
+            } else {
+                // set NULL value
+                $this->state[$property] = null;
+            }
         } else {
+            // perform value type checking
+            $this->checkTypes($property, $propertyValue);
+            // store value
             $this->state[$property] = $propertyValue;
         }
     }
