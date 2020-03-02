@@ -2,6 +2,7 @@
 
 namespace Craft\Http\EventListener;
 
+use Craft\Exception\ContextualErrorsNormalizer;
 use Craft\Http\Controller\Exception\ActionArgumentException;
 use Craft\Messaging\Http\HttpStatusCodes;
 use Craft\Security\Authentication\Exception\TokenAuthenticatorException;
@@ -55,7 +56,7 @@ class ExceptionHandlerListener
             case TokenAuthenticatorException::class :
             case TokenParserException::class :
                 $status = HttpStatusCodes::AUTHENTICATION_ERROR;
-                $data['errors'] = $exception->getErrors();
+                $data['errors'] = (new ContextualErrorsNormalizer())($exception->getErrors());
                 $this->logger->error(HttpStatusCodes::getName($status) . " error occurred", [$exception]);
                 break;
             case AccessDeniedException::class :
@@ -64,7 +65,7 @@ class ExceptionHandlerListener
                 break;
             case ActionArgumentException::class :
                 $status = HttpStatusCodes::INVALID_INPUT_ERROR;
-                $data['errors'] = $exception->getErrors();
+                $data['errors'] = (new ContextualErrorsNormalizer())($exception->getErrors());
                 $this->logger->error(HttpStatusCodes::getName($status) . " error occurred", [$data['errors']]);
                 break;
             case NotFoundHttpException::class :
