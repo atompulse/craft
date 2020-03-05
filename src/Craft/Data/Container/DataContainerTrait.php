@@ -399,7 +399,42 @@ trait DataContainerTrait
     private function checkTypes(string $property, $value)
     {
         $integrityConstraints = $this->getIntegritySpecification($property);
+        $actualValueType = $this->resolveActualValueType($value);
+        $isClassInstance = $actualValueType === 'object';
 
+        if (count($integrityConstraints)) {
+            // object check
+            if ($isClassInstance && !$this->isValidObject($integrityConstraints, $value)) {
+                throw new PropertyValueNotValidException(
+                    sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is instance of [%s]",
+                        get_class($this),
+                        $property,
+                        implode(',', $integrityConstraints),
+                        get_class($value)
+                    ));
+            }
+            // primitive check
+            if (!$isClassInstance && !$this->isValidPrimitiveType($integrityConstraints, $value)) {
+                throw new PropertyValueNotValidException(
+                    sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is [%s]",
+                        get_class($this),
+                        $property,
+                        implode(',', $integrityConstraints),
+                        $actualValueType
+                    ));
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Handle actual type resolution
+     * @param $value
+     * @return string
+     */
+    private function resolveActualValueType($value): string
+    {
         $actualValueType = gettype($value);
 
         if ($actualValueType === 'double') {
@@ -410,58 +445,53 @@ trait DataContainerTrait
             }
         }
 
-        if (count($integrityConstraints)) {
-            // object check
-            if ($actualValueType === 'object') {
-                if (!in_array(get_class($value), $integrityConstraints)) {
-                    throw new PropertyValueNotValidException(
-                        sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is instance of [%s]",
-                            get_class($this),
-                            $property,
-                            implode(',', $integrityConstraints),
-                            get_class($value)
-                        ));
-                }
-            } else {
-                // primitive type value
-                $isValidType = false;
-                foreach ($integrityConstraints as $type) {
-                    if ($type === 'object' && is_object($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif ($type === 'array' && is_array($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif ($type === 'string' && is_string($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif ($type === 'number' && is_numeric($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif (($type === 'integer' || $type === 'int') && is_int($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif (($type === 'boolean' || $type === 'bool') && is_bool($value)) {
-                        $isValidType = true;
-                        break;
-                    } elseif ($type === 'null' && $value === null) {
-                        $isValidType = true;
-                        break;
-                    }
-                }
-                if (!$isValidType) {
-                    throw new PropertyValueNotValidException(
-                        sprintf("Type error(%s): Property [%s] accepts only [%s] values, but given value is [%s]",
-                            get_class($this),
-                            $property,
-                            implode(',', $integrityConstraints),
-                            $actualValueType
-                        ));
-                }
+        return $actualValueType;
+    }
+
+    /**
+     * Check for primitive type validity
+     * @param array $integrityConstraints
+     * @param $value
+     * @return bool
+     */
+    private function isValidPrimitiveType(array $integrityConstraints, $value): bool
+    {
+        // primitive type value
+        $isValidType = false;
+        foreach ($integrityConstraints as $type) {
+            if ($type === 'array' && is_array($value)) {
+                $isValidType = true;
+                break;
+            } elseif ($type === 'string' && is_string($value)) {
+                $isValidType = true;
+                break;
+            } elseif ($type === 'number' && is_numeric($value)) {
+                $isValidType = true;
+                break;
+            } elseif (($type === 'integer' || $type === 'int') && is_int($value)) {
+                $isValidType = true;
+                break;
+            } elseif (($type === 'boolean' || $type === 'bool') && is_bool($value)) {
+                $isValidType = true;
+                break;
+            } elseif ($type === 'null' && $value === null) {
+                $isValidType = true;
+                break;
             }
         }
 
-        return true;
+        return $isValidType;
+    }
+
+    /**
+     * Check for object validity
+     * @param array $integrityConstraints
+     * @param $value
+     * @return bool
+     */
+    private function isValidObject(array $integrityConstraints, $value): bool
+    {
+        return in_array(get_class($value), $integrityConstraints) || in_array('object', $integrityConstraints);
     }
 
 }
