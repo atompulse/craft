@@ -2,6 +2,8 @@
 
 namespace Craft\Data\Processor;
 
+use RuntimeException;
+
 /**
  * Class Files
  *
@@ -40,9 +42,10 @@ class FileProcessor
      * @param string $delimiter
      * @return \Generator
      */
-    public static function csvFileToArrayGenerator(string $filename = '', string $delimiter = ','): \Generator
+    public static function csvFileToArrayGenerator(string $filename, string $delimiter = ','): \Generator
     {
         $complete = false;
+
         try {
             $header = null;
             if (($handle = fopen($filename, 'r')) !== false) {
@@ -57,12 +60,9 @@ class FileProcessor
             $complete = true;
         } finally {
             if (!$complete) {
-                // cleanup when loop breaks
-            } else {
-                // cleanup when loop completes
+                throw new RuntimeException(sprintf("Failed to process file [%s]", $filename));
             }
         }
-        // Do something only after loop completes
     }
 
     /**
