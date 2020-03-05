@@ -80,8 +80,8 @@ class ActionArgumentResolver implements ArgumentValueResolverInterface
             case 'GET' :
                 $params = $request->query->all();
                 break;
-            default:
             case 'POST' :
+            default:
                 $params = $request->request->all();
                 break;
         }
