@@ -6,7 +6,9 @@ use Craft\Data\Container\DataContainerInterface;
 use Craft\Data\Processor\StringProcessor;
 use LogicException;
 use ReflectionClass;
+use ReflectionException;
 use Symfony\Component\Validator\Constraints as Assert;
+use Craft\Data\Validation\Constraints as CraftAssert;
 
 /**
  * Class MetadataConstraintsBuilder
@@ -56,7 +58,7 @@ class MetadataConstraintsBuilder
                     $validatorConstraints[] = new Assert\Type(['type' => 'array']);
                     break;
                 case 'null' :
-                    $validatorConstraints[] = new Assert\NotBlank(['allowNull' => true]);
+                    $validatorConstraints[] = new CraftAssert\NotEmpty(['allowNull' => true]);
                     $isNullable = true;
                     break;
                 default:
@@ -75,30 +77,36 @@ class MetadataConstraintsBuilder
                             $validatorConstraints[] = $argument->getValidatorConstraints();
 
                         } else {
-                            throw new LogicException(sprintf(
-                                "[%s] MUST implement [%s] and [%s] to be supported by the MetadataConstraintsBuilder, declared for property [%s] of %s",
-                                $constraintName, DataContainerInterface::class, DataValidatorInterface::class, $property, get_class($this)));
+                            throw new LogicException(
+                                sprintf(
+                                    "[%s] MUST implement [%s] and [%s] to be supported by the MetadataConstraintsBuilder, declared for property [%s] of %s",
+                                    $constraintName,
+                                    DataContainerInterface::class,
+                                    DataValidatorInterface::class,
+                                    $property,
+                                    get_class($this)
+                                )
+                            );
                         }
                     } else {
 
                         // try to determine if its a valid symfony validator class
-                        $constraintClass = '\Symfony\Component\Validator\Constraints\\' . $this->buildSymfonyValidatorConstraintName($constraintName);
+                        $symfonyConstraintClass = '\Symfony\Component\Validator\Constraints\\' . $this->buildValidatorConstraintName($constraintName);
+                        $craftConstraintClass = '\Craft\Data\Validation\Constraints\\' . $this->buildValidatorConstraintName($constraintName);
 
-                        if (class_exists($constraintClass)) {
-
-                            $factory = new ReflectionClass($constraintClass);
-
-                            if ($hasArguments) {
-                                $constraintInstance = $factory->newInstance($args);
-                            } else {
-                                $constraintInstance = $factory->newInstance();
-                            }
-
-                            $validatorConstraints[] = $constraintInstance;
+                        if (class_exists($symfonyConstraintClass)) {
+                            $validatorConstraints[] = $this->buildValidator($symfonyConstraintClass, $hasArguments, $args);
+                        } elseif (class_exists($craftConstraintClass)) {
+                            $validatorConstraints[] = $this->buildValidator($craftConstraintClass, $hasArguments, $args);
                         } else {
-                            throw new LogicException(sprintf(
-                                "[%s] is not a valid Symfony Validator Constraint, declared for property [%s] of %s",
-                                $constraintName, $property, get_class($this)));
+                            throw new LogicException(
+                                sprintf(
+                                    "[%s] is not a valid Symfony or Craft Validator Constraint, declared for property [%s] of %s",
+                                    $constraintName,
+                                    $property,
+                                    get_class($this)
+                                )
+                            );
                         }
                     }
 
@@ -106,16 +114,38 @@ class MetadataConstraintsBuilder
             }
         }
 
-        // add "not blank" validator for non-nullable properties
+        // add "not empty" validator for non-nullable properties
         if ($isNullable === false) {
-            $validatorConstraints[] = new Assert\NotBlank();
+            $validatorConstraints[] = new CraftAssert\NotEmpty();
         }
 
         return $validatorConstraints;
     }
 
-    protected function buildSymfonyValidatorConstraintName(string $rawName): string
+    /**
+     * @param string $rawName
+     * @return string
+     */
+    protected function buildValidatorConstraintName(string $rawName): string
     {
         return StringProcessor::classify($rawName);
+    }
+
+    /**
+     * @param string $constraintClass
+     * @param bool $hasArguments
+     * @param array|null $args
+     * @return object
+     * @throws ReflectionException
+     */
+    protected function buildValidator(string $constraintClass, bool $hasArguments, $args = null): object
+    {
+        $factory = new ReflectionClass($constraintClass);
+
+        if ($hasArguments) {
+            return $factory->newInstance($args);
+        }
+
+        return $factory->newInstance();
     }
 }
