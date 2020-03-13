@@ -4,6 +4,7 @@ namespace Craft\Data\Validation;
 
 use Craft\Data\Container\DataContainerInterface;
 use Craft\Data\Processor\StringProcessor;
+use DateTime;
 use LogicException;
 use ReflectionClass;
 use ReflectionException;
@@ -56,6 +57,9 @@ class MetadataConstraintsBuilder
                     break;
                 case 'array' :
                     $validatorConstraints[] = new Assert\Type(['type' => 'array']);
+                    break;
+                case DateTime::class :
+                    $validatorConstraints[] = new CraftAssert\DateTime();
                     break;
                 case 'null' :
                     $validatorConstraints[] = new CraftAssert\NotEmpty(['allowNull' => true]);
