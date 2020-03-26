@@ -143,13 +143,15 @@ trait DataContainerTrait
 
         // add to array property type
         if (in_array('array', $this->getIntegritySpecification($property)) && !is_array($propertyValue)) {
-            if (is_null($this->getPropertyValue($property)) && !is_null($propertyValue)) {
+            if (!is_null($propertyValue)) {
                 // store array value
                 $this->state[$property][] = $propertyValue;
             } else {
                 // set NULL value
                 $this->state[$property] = null;
             }
+            // perform value type checking
+            $this->checkTypes($property, $this->getPropertyValue($property));
         } else {
             // perform value type checking
             $this->checkTypes($property, $propertyValue);
