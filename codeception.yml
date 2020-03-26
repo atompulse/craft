@@ -1,0 +1,14 @@
+namespace: Craft\Tests
+suites:
+  unit:
+    path: .
+
+settings:
+  shuffle: false
+  lint: true
+paths:
+  tests: tests
+  output: tests/_output
+  support: tests/_support
+  data: tests
+     
