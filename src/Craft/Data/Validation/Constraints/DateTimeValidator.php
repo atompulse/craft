@@ -24,6 +24,9 @@ class DateTimeValidator extends ConstraintValidator
      */
     public function validate($value, Constraint $constraint)
     {
+        if ($value === null) {
+            return;
+        }
 
         if (!$constraint instanceof DateTime) {
             throw new UnexpectedTypeException($constraint, __NAMESPACE__ . '\DateTime');
@@ -34,7 +37,7 @@ class DateTimeValidator extends ConstraintValidator
         }
 
         if (!is_scalar($value) && !(\is_object($value) && method_exists($value, '__toString'))) {
-            throw new UnexpectedValueException($value, 'string');
+            throw new UnexpectedValueException($value, 'string or DateTime');
         }
 
         $value = (string)$value;
